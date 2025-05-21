@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-210e3ba9837cfb9e962d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "CloudWorx",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "CloudWorx::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CloudWorx-Debug-b8f8038471518f5124d8.json",
+					"name" : "CloudWorx",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CloudWorx_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CloudWorx_autogen-Debug-f3e565b1c18e06b00947.json",
+					"name" : "CloudWorx_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CloudWorx_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CloudWorx_autogen_timestamp_deps-Debug-3b5f02cd6049edecf583.json",
+					"name" : "CloudWorx_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug",
+		"source" : "C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
