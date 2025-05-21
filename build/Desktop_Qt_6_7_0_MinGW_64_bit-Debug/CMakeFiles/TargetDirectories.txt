@@ -1,9 +1,0 @@
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/CloudWorx.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/install.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/CloudWorx_autogen_timestamp_deps.dir
-C:/Users/andre/Desktop/ISE YEAR 2/CloudWorx/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/CloudWorx_autogen.dir
