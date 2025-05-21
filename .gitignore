@@ -1,74 +1,62 @@
-# This file is used to ignore files which are generated
-# ----------------------------------------------------------------------------
+# Qt Creator and Qt build files
+*.pro.user*
+*.qmake.cache
+*.qmake.stash
 
-*~
-*.autosave
-*.a
-*.core
-*.moc
-*.o
-*.obj
-*.orig
-*.rej
-*.so
-*.so.*
-*_pch.h.cpp
-*_resource.rc
-*.qm
-.#*
-*.*#
-core
-!core/
-tags
-.DS_Store
-.directory
-*.debug
-Makefile*
-*.prl
-*.app
+# Build directories
+/build/
+/bin/
+/debug/
+/release/
+
+# Qt generated files
 moc_*.cpp
 ui_*.h
 qrc_*.cpp
-Thumbs.db
-*.res
-*.rc
-/.qmake.cache
-/.qmake.stash
 
-# qtcreator generated files
-*.pro.user*
-CMakeLists.txt.user*
-
-# xemacs temporary files
-*.flc
-
-# Vim temporary files
+# Backup and temporary files
+*~
+*.autosave
+*.orig
+*.rej
+*.swp
 .*.swp
+*.flc
+*.*#
 
-# Visual Studio generated files
-*.ib_pdb_index
-*.idb
-*.ilk
-*.pdb
+# Object files and binaries
+*.o
+*.obj
+*.so
+*.so.*
+*.dll
+*.exe
+*.a
+*.lib
+
+# Core dumps
+*.core
+core
+
+# IDE files
 *.sln
 *.suo
-*.vcproj
-*vcproj.*.*.user
+*.vcxproj*
+*.vcproj*
 *.ncb
 *.sdf
 *.opensdf
-*.vcxproj
-*vcxproj.*
+*.idb
+*.ilk
+*.pdb
 
-# MinGW generated files
-*.Debug
-*.Release
+# Misc OS files
+.DS_Store
+Thumbs.db
+.directory
 
-# Python byte code
+# Python (if any)
 *.pyc
 
-# Binaries
-# --------
-*.dll
-*.exe
-
+# Tag files
+tags
