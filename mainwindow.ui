@@ -7,25 +7,173 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CloudWorx</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>25</height>
-    </rect>
-   </property>
+  <property name="windowIcon">
+   <iconset resource="Images.qrc">
+    <normaloff>:/cloudworx_logowebp.png</normaloff>:/cloudworx_logowebp.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>-21</y>
+      <width>800</width>
+      <height>500</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="page">
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>120</y>
+        <width>311</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
+    color: #549bff;
+    font-size: 50px;
+    font-weight: 600;</string>
+      </property>
+      <property name="text">
+       <string>CLOUDWORX</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="loginButton">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>250</y>
+        <width>191</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: #4A90E2;
+    color: white;
+    font-family: &quot;Inter&quot;, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #5AA9F4;
+}
+
+QPushButton:pressed {
+    background-color: #3A78C2;
+}
+
+QPushButton:disabled {
+    background-color: #A0C4FF;
+    color: #E0E0E0;
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Login</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="signUpButton">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>350</y>
+        <width>191</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: #4A90E2;
+    color: white;
+    font-family: &quot;Inter&quot;, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #5AA9F4;
+}
+
+QPushButton:pressed {
+    background-color: #3A78C2;
+}
+
+QPushButton:disabled {
+    background-color: #A0C4FF;
+    color: #E0E0E0;
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Sign Up</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>161</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="Images.qrc">:/cloudworx_logowebp.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>200</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QWidget {
+    font-family: &quot;Inter&quot;, sans-serif;
+    color: #1a66ff;
+    font-size: 16px;
+    font-weight: 600;
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Secure File Sharing Platform</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_2"/>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="Images.qrc"/>
+ </resources>
  <connections/>
 </ui>

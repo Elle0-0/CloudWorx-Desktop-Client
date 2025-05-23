@@ -1,5 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "LoginPage.h"
+#include "SignUpPage.h"
 
 #include <QMainWindow>
 
@@ -17,7 +19,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+
+    void goToLogin();
+
+    void goToSignUp();
+
+    void goToMenu();
 private:
     Ui::MainWindow *ui;
+    LoginPage *loginPage;
+    SignUpPage *signUpPage;
 };
 #endif // MAINWINDOW_H

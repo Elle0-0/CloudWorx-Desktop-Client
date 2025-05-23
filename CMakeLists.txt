@@ -23,6 +23,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(CloudWorx
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        loginpage.h loginpage.cpp loginpage.ui
+        signuppage.h signuppage.cpp signuppage.ui
+        fileuploadpage.h fileuploadpage.cpp fileuploadpage.ui
+        Images.qrc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CloudWorx APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

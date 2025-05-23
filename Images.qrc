@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>cloudworx_logowebp.png</file>
+    </qresource>
+</RCC>
