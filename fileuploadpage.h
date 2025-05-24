@@ -1,4 +1,4 @@
-#ifndef FILEUPLOADPAGE_H
+            #ifndef FILEUPLOADPAGE_H
 #define FILEUPLOADPAGE_H
 
 #include <QWidget>
