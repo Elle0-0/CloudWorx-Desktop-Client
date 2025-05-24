@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 13.0.1, 2025-05-21T03:14:27. -->
+<!-- Written by QtCreator 13.0.1, 2025-05-24T17:05:41. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -107,7 +107,10 @@
 -DCMAKE_PREFIX_PATH:PATH=%{Qt:QT_INSTALL_PREFIX}
 -DCMAKE_C_COMPILER:FILEPATH=%{Compiler:Executable:C}
 -DCMAKE_CXX_COMPILER:FILEPATH=%{Compiler:Executable:Cxx}
--DCMAKE_CXX_FLAGS_INIT:STRING=%{Qt:QML_DEBUG_FLAG}</value>
+-DCMAKE_CXX_FLAGS_INIT:STRING=%{Qt:QML_DEBUG_FLAG}
+-DCMAKE_TOOLCHAIN_FILE:UNINITIALIZED=C:/Users/andre/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+</value>
     <value type="int" key="EnableQmlDebugging">0</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\andre\Desktop\ISE YEAR 2\CloudWorx\build\Desktop_Qt_6_7_0_MinGW_64_bit-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
