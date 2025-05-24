@@ -24,6 +24,7 @@ signals:
 private slots:
     void on_backButton_clicked();
     void on_loginButton_clicked();
+    void on_signUpButton_clicked();
 };
 
 #endif // SIGNUPPAGE_H
