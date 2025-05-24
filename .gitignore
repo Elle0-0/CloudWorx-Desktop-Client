@@ -9,6 +9,7 @@
 /debug/
 /release/
 build/
+libs/
 
 # Qt generated files
 moc_*.cpp
