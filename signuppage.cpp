@@ -67,6 +67,7 @@ void SignUpPage::on_signUpButton_clicked()
 
     // Clear sensitive data from memory
     sodium_memzero(passwordBytes.data(), passwordBytes.size());
+    sodium_memzero(password.data(), password.size());
 
     std::cout << hashedPassword.toStdString() << std::endl;
     std::cout << "Username : " << username.toStdString() << std::endl;
