@@ -16,10 +16,10 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>30</y>
-     <width>161</width>
-     <height>161</height>
+     <x>0</x>
+     <y>0</y>
+     <width>101</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="text">
@@ -30,6 +30,134 @@
    </property>
    <property name="scaledContents">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>40</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Upload file</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="uploadFileButton">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>70</y>
+     <width>211</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background-color: #4A90E2;
+    color: white;
+    font-family: &quot;Inter&quot;, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #5AA9F4;
+}
+
+QPushButton:pressed {
+    background-color: #3A78C2;
+}
+
+QPushButton:disabled {
+    background-color: #A0C4FF;
+    color: #E0E0E0;
+}</string>
+   </property>
+   <property name="text">
+    <string>Choose file to upload</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="uploadedFileLabel">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>170</y>
+     <width>511</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Uploaded file displayed here</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="encryptFileButton">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>380</y>
+     <width>211</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background-color: #4A90E2;
+    color: white;
+    font-family: &quot;Inter&quot;, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #5AA9F4;
+}
+
+QPushButton:pressed {
+    background-color: #3A78C2;
+}
+
+QPushButton:disabled {
+    background-color: #A0C4FF;
+    color: #E0E0E0;
+}</string>
+   </property>
+   <property name="text">
+    <string>Encrypt file</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>230</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Enter encryption password:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="encryptionPasswordTextField">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>270</y>
+     <width>471</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="echoMode">
+    <enum>QLineEdit::Password</enum>
    </property>
   </widget>
  </widget>

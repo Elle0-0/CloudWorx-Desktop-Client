@@ -99,7 +99,7 @@ bool isPasswordNISTCompliant(const QString& password, QString& errorMessage) {
         }
     }
 
-    // Check for repetitive patterns (good security practice)
+    // Check for repetitive pattern
     if (hasRepetitivePattern(password)) {
         issues << "Password contains repetitive patterns (like 'aaa' or '123').";
     }

@@ -15,6 +15,12 @@ public:
     explicit FileUploadPage(QWidget *parent = nullptr);
     ~FileUploadPage();
 
+private slots:
+
+    void on_uploadFileButton_clicked();
+
+    void on_encryptFileButton_clicked();
+
 private:
     Ui::FileUploadPage *ui;
 };
