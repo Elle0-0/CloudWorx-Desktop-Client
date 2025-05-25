@@ -51,7 +51,7 @@
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>250</y>
+        <y>230</y>
         <width>191</width>
         <height>61</height>
        </rect>
@@ -90,7 +90,7 @@ QPushButton:disabled {
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>350</y>
+        <y>320</y>
         <width>191</width>
         <height>61</height>
        </rect>
@@ -164,6 +164,45 @@ QPushButton:disabled {
       </property>
       <property name="text">
        <string>Secure File Sharing Platform</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="uploadFileButton">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>410</y>
+        <width>191</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: #4A90E2;
+    color: white;
+    font-family: &quot;Inter&quot;, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #5AA9F4;
+}
+
+QPushButton:pressed {
+    background-color: #3A78C2;
+}
+
+QPushButton:disabled {
+    background-color: #A0C4FF;
+    color: #E0E0E0;
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Upload File</string>
       </property>
      </widget>
     </widget>

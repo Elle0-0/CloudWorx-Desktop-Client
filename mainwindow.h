@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include "LoginPage.h"
 #include "SignUpPage.h"
+#include "fileuploadpage.h"
 
 #include <QMainWindow>
 
@@ -26,9 +27,14 @@ private slots:
     void goToSignUp();
 
     void goToMenu();
+
+    void goToFileUpload();
+
+
 private:
     Ui::MainWindow *ui;
     LoginPage *loginPage;
     SignUpPage *signUpPage;
+    FileUploadPage *fileUploadPage;
 };
 #endif // MAINWINDOW_H
