@@ -1,4 +1,4 @@
-            #ifndef FILEUPLOADPAGE_H
+#ifndef FILEUPLOADPAGE_H
 #define FILEUPLOADPAGE_H
 
 #include <QWidget>
@@ -23,6 +23,8 @@ private slots:
 
 private:
     Ui::FileUploadPage *ui;
+    QString selectedFilePath;
+    QString getSelectedFilePath() const;
 };
 
 #endif // FILEUPLOADPAGE_H
