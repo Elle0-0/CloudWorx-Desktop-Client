@@ -20,6 +20,7 @@ private:
 
 signals:
     void backToMenu();
+    void signUpSuccessful();
 
 private slots:
     void on_backButton_clicked();

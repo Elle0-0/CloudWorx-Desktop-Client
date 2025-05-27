@@ -73,6 +73,8 @@ void SignUpPage::on_signUpButton_clicked()
     std::cout << "Username : " << username.toStdString() << std::endl;
     std::cout << "email : " << email.toStdString() << std::endl;
 
+    emit signUpSuccessful();
+
 }
 
 

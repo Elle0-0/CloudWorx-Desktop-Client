@@ -3,6 +3,7 @@
 #include "LoginPage.h"
 #include "SignUpPage.h"
 #include "fileuploadpage.h"
+#include "filepasswordpage.h"
 
 #include <QMainWindow>
 
@@ -30,11 +31,14 @@ private slots:
 
     void goToFileUpload();
 
+    void goToFilePassword();
+
 
 private:
     Ui::MainWindow *ui;
     LoginPage *loginPage;
     SignUpPage *signUpPage;
     FileUploadPage *fileUploadPage;
+    FilePasswordPage *filePasswordPage;
 };
 #endif // MAINWINDOW_H

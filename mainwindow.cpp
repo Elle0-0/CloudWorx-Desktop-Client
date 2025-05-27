@@ -10,16 +10,20 @@ MainWindow::MainWindow(QWidget *parent)
     loginPage = new LoginPage(this);
     signUpPage = new SignUpPage(this);
     fileUploadPage = new FileUploadPage(this);
+    filePasswordPage = new FilePasswordPage(this);
 
     ui->stackedWidget->addWidget(loginPage);
     ui->stackedWidget->addWidget(signUpPage);
     ui->stackedWidget->addWidget(fileUploadPage);
+    ui->stackedWidget->addWidget(filePasswordPage);
 
     connect(ui->loginButton, &QPushButton::clicked, this, &MainWindow::goToLogin);
     connect(ui->signUpButton, &QPushButton::clicked, this, &MainWindow::goToSignUp);
     connect(ui->uploadFileButton, &QPushButton::clicked, this, &MainWindow::goToFileUpload);
     connect(loginPage, &LoginPage::backToMenu, this, &MainWindow::goToMenu);
     connect(signUpPage, &SignUpPage::backToMenu, this, &MainWindow::goToMenu);
+    connect(signUpPage, &SignUpPage::signUpSuccessful, this, &MainWindow::goToFilePassword);
+
 }
 
 MainWindow::~MainWindow()
@@ -40,6 +44,9 @@ void MainWindow::goToMenu() {
 
 void MainWindow::goToFileUpload() {
     ui->stackedWidget->setCurrentWidget(fileUploadPage);
+}
+void MainWindow::goToFilePassword() {
+    ui->stackedWidget->setCurrentWidget(filePasswordPage);
 }
 
 
