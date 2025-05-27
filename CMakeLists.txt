@@ -28,6 +28,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         fileuploadpage.h fileuploadpage.cpp fileuploadpage.ui
         Images.qrc
         argon2id_utils.h argon2id_utils.cpp
+        filepasswordpage.h filepasswordpage.cpp filepasswordpage.ui
+        envelopeencryption.h envelopeencryption.cpp
+        envelopeencryptionmanager.h envelopeencryptionmanager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CloudWorx APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
