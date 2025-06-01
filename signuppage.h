@@ -20,7 +20,7 @@ private:
 
 signals:
     void backToMenu();
-    void signUpSuccessful();
+    void signUpSuccessful(const QString &username, const QString &email, const QString &hashedPassword);
 
 private slots:
     void on_backButton_clicked();

@@ -3,7 +3,6 @@
 #include "argon2id_utils.h"
 #include <QRegularExpression>
 #include <QMessageBox>
-#include <iostream>
 #include <sodium.h>
 
 
@@ -69,11 +68,8 @@ void SignUpPage::on_signUpButton_clicked()
     sodium_memzero(passwordBytes.data(), passwordBytes.size());
     sodium_memzero(password.data(), password.size());
 
-    std::cout << hashedPassword.toStdString() << std::endl;
-    std::cout << "Username : " << username.toStdString() << std::endl;
-    std::cout << "email : " << email.toStdString() << std::endl;
 
-    emit signUpSuccessful();
+    emit signUpSuccessful(username, email, hashedPassword);
 
 }
 
