@@ -1,6 +1,6 @@
 #include "fileuploadpage.h"
 #include "ui_fileuploadpage.h"
-#include "envelopeencryption.h"
+#include "envelopeencryptionmanager.h"
 
 #include <QMessageBox>
 #include <sodium.h>
@@ -63,18 +63,16 @@ void FileUploadPage::on_encryptFileButton_clicked()
     try {
         QByteArray passwordBytes = password.toUtf8();
 
-        // Encrypt the file
+        bool passwordVerification = EnvelopeEncryptionManager::verifyUserFilePassword("1", passwordBytes);
 
+        if (!passwordVerification) {
+            QMessageBox::critical(this, "Wrong Password", "password incorrect");
+            return;
+        }
 
-        // Send to server or save locally - not implemented yet
-        //bool success = saveEncryptionResultToServer(result);
+        QString fileEncryptedSuccess = EnvelopeEncryptionManager::encryptAndStoreFile("1", filePath, passwordBytes);
 
-        // if (success) {
-        //     qDebug() << "File encrypted and uploaded successfully";
-        //     // Update UI to show success
-        // } else {
-        //     qDebug() << "Failed to upload encrypted file";
-        // }
+        QMessageBox::information(this, "Success", "File encrypted successfully");
 
         // Secure cleanup
         sodium_memzero(passwordBytes.data(), passwordBytes.size());
@@ -85,7 +83,7 @@ void FileUploadPage::on_encryptFileButton_clicked()
     }
 
     ui->encryptionPasswordTextField->clear();
-    sodium_memzero(password.data(), password.size());
+
 }
 
 // bool FileUploadPage::saveEncryptionResultToServer(const EnvelopeEncryptionResult& result)
