@@ -31,6 +31,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         filepasswordpage.h filepasswordpage.cpp filepasswordpage.ui
         envelopeencryption.h envelopeencryption.cpp
         envelopeencryptionmanager.h envelopeencryptionmanager.cpp
+        dashboard.h dashboard.cpp dashboard.ui
+        decryptfilepage.h decryptfilepage.cpp decryptfilepage.ui
+        sharefilepage.h sharefilepage.cpp sharefilepage.ui
+        models/filemodel.h
+        models/filelistmodel.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CloudWorx APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -80,21 +85,16 @@ link_directories(${LIBSODIUM_DIR}/lib)
 
 target_link_libraries(CloudWorx PRIVATE ${LIBSODIUM_DIR}/lib/libsodium.a)
 
+set(LIBCURL_DIR "${CMAKE_SOURCE_DIR}/libs/curl")
+
+include_directories(${LIBCURL_DIR}/include)
+link_directories(${LIBCURL_DIR}/lib)
+
+target_link_libraries(CloudWorx PRIVATE ${LIBCURL_DIR}/lib/libcurl.a)
+
 
 include_directories("C:/Program Files/OpenSSL-Win64/include")
 
-# if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-#     set(OPENSSL_SSL_LIB "C:/Program Files/OpenSSL-Win64/lib/VC/x64/MDd/libssl.lib")
-#     set(OPENSSL_CRYPTO_LIB "C:/Program Files/OpenSSL-Win64/lib/VC/x64/MDd/libcrypto.lib")
-# else()
-#     set(OPENSSL_SSL_LIB "C:/Program Files/OpenSSL-Win64/lib/VC/x64/MD/libssl.lib")
-#     set(OPENSSL_CRYPTO_LIB "C:/Program Files/OpenSSL-Win64/lib/VC/x64/MD/libcrypto.lib")
-# endif()
-
-# target_link_libraries(CloudWorx PRIVATE
-#     "${OPENSSL_SSL_LIB}"
-#     "${OPENSSL_CRYPTO_LIB}"
-# )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(OPENSSL_SSL_LIB "${CMAKE_SOURCE_DIR}/libs/libssl.lib")
@@ -104,12 +104,11 @@ else()
     set(OPENSSL_CRYPTO_LIB "${CMAKE_SOURCE_DIR}/libs/libcrypto.lib")
 endif()
 
+
 target_link_libraries(CloudWorx PRIVATE
     "${OPENSSL_SSL_LIB}"
     "${OPENSSL_CRYPTO_LIB}"
 )
-
-
 
 
 if(QT_VERSION_MAJOR EQUAL 6)
