@@ -52,34 +52,34 @@ public:
     explicit EnvelopeEncryptionManager(const QString& serverUrl, QObject* parent = nullptr);
 
     // User setup - creates KEK and sends to server
-    bool setupUserEncryption(const QString& username, const QString& email, const QString& authPassword, const QByteArray& filePassword);
+    static bool setupUserEncryption(const QString& username, const QString& email, const QString& authPassword, const QByteArray& filePassword);
 
     // Password verification - fetches KEK from server and tries to unwrap
-    bool verifyUserPassword(const QString& userId, const QByteArray& password);
+    static bool verifyUserFilePassword(const QString& userId, const QByteArray& password);
 
     // File operations
-    QString encryptAndStoreFile(const QString& userId, const QString& filePath,
+    static QString encryptAndStoreFile(const QString& userId, const QString& filePath,
                                 const QByteArray& password);
-    QByteArray decryptAndSaveFile(const QString& fileId, const QString& userId,
+    static QByteArray decryptAndSaveFile(const QString& fileId, const QString& userId,
                             const QByteArray& password, const QString& outputPath);
 
     // Helper functions
-    QByteArray getUserKEK(const QString& userId, const QByteArray& password);
+    static QByteArray getUserKEK(const QString& userId, const QByteArray& password);
 
 private:
 
     // API operations
-    bool sendUserKEK(const UserKEKData& kekData);
-    bool sendFileData(const FileData& fileData);
+    static bool sendUserKEK(const UserKEKData& kekData);
+    static bool sendFileData(const FileData& fileData);
 
-    UserKEKData fetchUserKEK(const QString& userId);
-    FileData fetchFileData(const QString& fileId);
+    static UserKEKData fetchUserKEK(const QString& userId);
+    static FileData fetchFileData(const QString& fileId);
 
 
     // Utility functions
-    QString encodeBase64(const QByteArray& data);
-    QByteArray decodeBase64(const QString& data);
-    QString generateUuid();
+    static QString encodeBase64(const QByteArray& data);
+    static QByteArray decodeBase64(const QString& data);
+    static QString generateUuid();
 };
 
 #endif // ENVELOPEENCRYPTIONMANAGER_H

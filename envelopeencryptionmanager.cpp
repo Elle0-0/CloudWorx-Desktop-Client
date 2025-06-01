@@ -1,5 +1,7 @@
 #include "envelopeencryptionmanager.h"
 
+#include "network/authapi.h"
+
 #include "envelopeencryption.h"
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -16,26 +18,30 @@ bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, con
     try {
         // Generate KEK and wrap it with password-derived key
         WrappedKEKResult kekResult = EnvelopeEncryption::generateAndWrapKEK(filePassword);
+        qDebug() << "[setupUserEncryption] KEK generated and wrapped.";
 
-        // Prepare data for server
-        UserKEKData kekData;
-        kekData.username = username;
-        kekData.authPassword = authPassword;
-        kekData.email = email;
-        kekData.ivKEK = encodeBase64(kekResult.kekNonce);
-        kekData.encryptedKEK = encodeBase64(kekResult.wrappedKEK);
-        kekData.salt = encodeBase64(kekResult.salt);
-        kekData.timeCost = kekResult.timeCost;
-        kekData.memoryCost = kekResult.memoryCost;
+        UserRegisterModel model;
+        model.username = username;
+        model.email = email;
+        model.auth_password = authPassword;
+        model.iv_KEK = encodeBase64(kekResult.kekNonce);
+        model.encrypted_KEK = encodeBase64(kekResult.wrappedKEK);
 
-        // Send to server - bool set to default for now
-        bool success = true;
-        //sendUserKEK(kekData);
+        // hardcoded public key here
+        model.public_key = QString("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQTRGVktiUHJiTkdBYWo3RDFUUFM2bDV5NEVFNGJ1SWFGdlF3c3VSampmSDg9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=");
 
-        // Clear sensitive data
+        AuthAPI api;
+        QString serverResponse;
+        bool success = api.registerUser(model, serverResponse);
+
+        if (!success) {
+            qWarning() << "[setupUserEncryption] Registration failed. Server response:" << serverResponse;
+            return false;
+        }
+
+        qDebug() << "[setupUserEncryption] User registered successfully. " << serverResponse;
         sodium_memzero(const_cast<char*>(kekResult.kek.constData()), kekResult.kek.size());
-
-        return success;
+        return true;
 
     } catch (const std::exception& e) {
         qDebug() << "Setup user encryption failed:" << e.what();
@@ -43,7 +49,7 @@ bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, con
     }
 }
 
-bool EnvelopeEncryptionManager::verifyUserPassword(const QString& userId, const QByteArray& password)
+bool EnvelopeEncryptionManager::verifyUserFilePassword(const QString& userId, const QByteArray& password)
 {
     try {
         // Fetch KEK data from server
@@ -52,6 +58,7 @@ bool EnvelopeEncryptionManager::verifyUserPassword(const QString& userId, const 
             qDebug() << "No KEK found for user:" << userId;
             return false;
         }
+
 
         // Try to derive PDK and unwrap KEK
         QByteArray salt = decodeBase64(kekData.salt);
@@ -91,6 +98,10 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
                                                        const QByteArray& password)
 {
     try {
+
+        qDebug() << "[encryptAndStoreFile] Starting encryption process for user:" << userId;
+        qDebug() << "[encryptAndStoreFile] File path:" << filePath;
+
         // Get user's KEK
         QByteArray userKEK = getUserKEK(userId, password);
         if (userKEK.isEmpty()) {
@@ -109,7 +120,11 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
 
         // Encrypt file with KEK
         EnvelopeEncryptionResult encResult = EnvelopeEncryption::encryptWithKEK(fileData, userKEK);
-
+        qDebug() << "[encryptAndStoreFile] File encrypted.";
+        qDebug() << "  ivFile:" << encodeBase64(encResult.msgNonce);
+        qDebug() << "  ivDEK:" << encodeBase64(encResult.dekNonce);
+        qDebug() << "  encryptedDEK (len):" << encResult.wrappedDEK.size();
+        qDebug() << "  ciphertext (len):" << encResult.ciphertext.size();
 
 
         // Prepare file data
@@ -122,6 +137,15 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
         fileDataObj.ivFile = encodeBase64(encResult.msgNonce);
         fileDataObj.ivDEK = encodeBase64(encResult.dekNonce);
         fileDataObj.encryptedDEK = encodeBase64(encResult.wrappedDEK);
+
+        qDebug() << "[encryptAndStoreFile] Prepared FileData:";
+        qDebug() << "  fileName:" << fileDataObj.fileName;
+        qDebug() << "  fileType:" << fileDataObj.fileType;
+        qDebug() << "  fileSize:" << fileDataObj.fileSize;
+        qDebug() << "  ivFile:" << fileDataObj.ivFile;
+        qDebug() << "  ivDEK:" << fileDataObj.ivDEK;
+        qDebug() << "  encryptedDEK : " << fileDataObj.encryptedDEK;
+        qDebug() << "  encryptedFile (Base64):" << encodeBase64(fileDataObj.encryptedFile);
 
         //uncomment once implemented
         bool fileSuccess = true;
@@ -244,6 +268,21 @@ UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& userId)
     //     return UserKEKData::fromJson(response.value("data").toObject());
     // }
     // return UserKEKData(); // Empty if failed
+
+    qDebug() << "[fetchUserKEK] Simulating fetch for userId:" << userId;
+
+    // Simulated data
+    UserKEKData data;
+    data.username = "m";
+    data.email = "m@m.com";
+    data.authPassword = "$argon2id$v=19$m=12,t=3,p=1$xekKGWWnO1kqr2WZxoIudQ$LSndBzDryGPZYv/DU53KfpdESXQNPObrCozBjdJUBJw";
+    data.ivKEK = "8lDPwQf2BVLFPUZr";
+    data.encryptedKEK = "iL+UWqu2XmHPWvnkBLZ1v7/7UVGYejq3pPCYr37y+7+suT7TkE1i37nLR+sdbIfU";
+    data.salt = "Zka8TscZPrLkAvqAqDln2A==";
+    data.timeCost = 3;
+    data.memoryCost = 12288;
+
+    return data;
 }
 
 
@@ -288,7 +327,7 @@ UserKEKData UserKEKData::fromJson(const QJsonObject& json)
 QJsonObject FileData::toJson() const
 {
     QJsonObject obj;
-    obj["fileName"] = fileName;
+    obj["file_name"] = fileName;
     obj["file_type"] = fileType;
     obj["file_size"] = fileSize;
     obj["iv_file"] = ivFile;
@@ -301,7 +340,7 @@ QJsonObject FileData::toJson() const
 FileData FileData::fromJson(const QJsonObject& json)
 {
     FileData data;
-    data.fileName = json["fileName"].toString(); // Note: toJson uses "fileName", not "file_name"
+    data.fileName = json["file_name"].toString();
     data.fileType = json["file_type"].toString();
     data.fileSize = json["file_size"].toInt();
     data.ivFile = json["iv_file"].toString();

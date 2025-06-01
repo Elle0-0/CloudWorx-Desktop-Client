@@ -17,8 +17,8 @@ KeyDerivationResult EnvelopeEncryption::deriveEncryptionKey(const QByteArray& pa
     result.salt = QByteArray(reinterpret_cast<char*>(salt), sizeof salt);
 
     // Set parameters
-    result.timeCost = 8;
-    result.memoryCost = 1 << 16;  // 64 MB
+    result.timeCost = 3;
+    result.memoryCost = 12288;
 
     // Derive 256-bit key
     unsigned char key[32];  // 256 bits
