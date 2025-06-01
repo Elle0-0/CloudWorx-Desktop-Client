@@ -36,6 +36,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         sharefilepage.h sharefilepage.cpp sharefilepage.ui
         models/filemodel.h
         models/filelistmodel.h
+        network/authapi.h network/authapi.cpp
+        models/UserRegisterModel.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CloudWorx APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -85,12 +87,16 @@ link_directories(${LIBSODIUM_DIR}/lib)
 
 target_link_libraries(CloudWorx PRIVATE ${LIBSODIUM_DIR}/lib/libsodium.a)
 
+# set(LIBCURL_DIR "${CMAKE_SOURCE_DIR}/libs/curl")
+
+# include_directories(${LIBCURL_DIR}/include)
+# link_directories(${LIBCURL_DIR}/lib)
+
+# target_link_libraries(CloudWorx PRIVATE ${LIBCURL_DIR}/lib/libcurl.a)
+
 set(LIBCURL_DIR "${CMAKE_SOURCE_DIR}/libs/curl")
-
-include_directories(${LIBCURL_DIR}/include)
-link_directories(${LIBCURL_DIR}/lib)
-
-target_link_libraries(CloudWorx PRIVATE ${LIBCURL_DIR}/lib/libcurl.a)
+target_include_directories(CloudWorx PRIVATE "${LIBCURL_DIR}/include")
+target_link_libraries(CloudWorx PRIVATE "${LIBCURL_DIR}/lib/libcurl.dll.a")
 
 
 include_directories("C:/Program Files/OpenSSL-Win64/include")

@@ -16,8 +16,8 @@ QString hashPassword(const QByteArray& password) {
             hashed,
             password.constData(),
             static_cast<unsigned long long>(password.length()),
-            8,                      // timeCost
-            1 << 16,               // memoryCost = 64 MB
+            3,                      // timeCost
+            12288,               // memoryCost = 12 MiB
             crypto_pwhash_ALG_ARGON2ID13
             ) != 0) {
         qDebug() << "Out of memory!";
