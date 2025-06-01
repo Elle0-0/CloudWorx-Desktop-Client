@@ -17,6 +17,9 @@
    <iconset resource="Images.qrc">
     <normaloff>:/cloudworx_logowebp.png</normaloff>:/cloudworx_logowebp.png</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
@@ -26,6 +29,9 @@
       <width>800</width>
       <height>500</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">

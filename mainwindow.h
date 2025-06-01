@@ -4,6 +4,9 @@
 #include "SignUpPage.h"
 #include "fileuploadpage.h"
 #include "filepasswordpage.h"
+#include "dashboard.h"
+#include "decryptfilepage.h"
+#include "sharefilepage.h"
 
 #include <QMainWindow>
 
@@ -33,6 +36,12 @@ private slots:
 
     void goToFilePassword();
 
+    void goToDashboard();
+
+    void goToFileDecryption();
+
+    void goToFileShare();
+
 
 private:
     Ui::MainWindow *ui;
@@ -40,5 +49,8 @@ private:
     SignUpPage *signUpPage;
     FileUploadPage *fileUploadPage;
     FilePasswordPage *filePasswordPage;
+    Dashboard *dashboardPage;
+    DecryptFilePage *decryptFilePage;
+    ShareFilePage *shareFilepage;
 };
 #endif // MAINWINDOW_H
