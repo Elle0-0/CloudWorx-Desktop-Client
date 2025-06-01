@@ -35,14 +35,17 @@ void LoginPage::on_loginButton_clicked()
     QString username = ui->usernameTextField->text();
     QString password = ui->passwordTextField->text();
 
-    QString placeHolder = " ";
+    QString placeHolder = "$argon2id$v=19$m=12,t=3,p=1$xekKGWWnO1kqr2WZxoIudQ$LSndBzDryGPZYv/DU53KfpdESXQNPObrCozBjdJUBJw";
     QByteArray passwordBytes = password.toUtf8();
 
     if (!verifyPassword(passwordBytes, placeHolder)) {
         QMessageBox::information(this, "error", "Incorrect Password");
+        return;
     }
 
     sodium_memzero(password.data(), password.size());
     sodium_memzero(passwordBytes.data(), passwordBytes.size());
+
+    emit goToDashboard();
 }
 

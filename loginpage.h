@@ -27,6 +27,8 @@ private:
 
 signals:
     void backToMenu();
+
+    void goToDashboard();
 };
 
 #endif // LOGINPAGE_H
