@@ -10,6 +10,10 @@ struct UserRegisterModel {
     QString public_key;
     QString iv_KEK;
     QString encrypted_KEK;
+    QString salt;
+    int p;
+    int m;
+    int t;
 };
 
 #endif // USERREGISTERMODEL_H
