@@ -23,7 +23,10 @@ private:
     Ui::FilePasswordPage *ui;
     QString username;
     QString email;
-    QString hashedPassword;
+    QString password;
+
+signals:
+    void goToLogin();
 };
 
 #endif // FILEPASSWORDPAGE_H

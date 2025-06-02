@@ -17,16 +17,16 @@ FilePasswordPage::~FilePasswordPage()
 {
     delete ui;
 }
-void FilePasswordPage::setUserData(const QString &username, const QString &email, const QString &hashedPassword) {
+void FilePasswordPage::setUserData(const QString &username, const QString &email, const QString &password) {
     this->username = username;
     this->email = email;
-    this->hashedPassword = hashedPassword;
+    this->password = password;
 
     //display to make sure for now
     qDebug() << "User data received in FilePasswordPage:";
     qDebug() << "Username:" << username;
     qDebug() << "Email:" << email;
-    qDebug() << "Hashed Password:" << hashedPassword;
+    qDebug() << "Password:" << password;
 }
 
 void FilePasswordPage::on_createPasswordButton_clicked()
@@ -50,10 +50,15 @@ void FilePasswordPage::on_createPasswordButton_clicked()
 
     QByteArray passwordBytes = password.toUtf8();
 
-    bool success = EnvelopeEncryptionManager::setupUserEncryption(username, email, hashedPassword, passwordBytes);
+    bool success = EnvelopeEncryptionManager::setupUserEncryption(username, email, password, passwordBytes);
 
-    if (success) qDebug() << "User file password set";
-
+    if (!success) {
+        qDebug() << "error";
+        return;
+    }else {
+        qDebug() << "User file password set";
+        emit goToLogin();
+    }
 
     // Clear sensitive data from memory
     sodium_memzero(passwordBytes.data(), passwordBytes.size());
