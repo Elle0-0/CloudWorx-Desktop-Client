@@ -38,6 +38,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         models/filelistmodel.h
         network/authapi.h network/authapi.cpp
         models/UserRegisterModel.h
+        models/UserLoginModel.h
+        network/filesapi.h network/filesapi.cpp
+        utils/ApiHelper.h
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CloudWorx APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
