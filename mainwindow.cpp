@@ -28,11 +28,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->uploadFileButton, &QPushButton::clicked, this, &MainWindow::goToFileUpload);
     connect(loginPage, &LoginPage::backToMenu, this, &MainWindow::goToMenu);
     connect(signUpPage, &SignUpPage::backToMenu, this, &MainWindow::goToMenu);
+    connect(loginPage, &LoginPage::goToDashboard, this, &MainWindow::goToDashboard);
+    connect(filePasswordPage, &FilePasswordPage::goToLogin, this, &MainWindow::goToLogin);
+
     connect(signUpPage, &SignUpPage::signUpSuccessful, this, [=](const QString &username, const QString &email, const QString &hashedPassword) {
         filePasswordPage->setUserData(username, email, hashedPassword);
         goToFilePassword();
     });
-    connect(loginPage, &LoginPage::goToDashboard, this, &MainWindow::goToDashboard);
     connect(dashboardPage, &Dashboard::goToFileDecryption, this, [=](const FileModel &file){
             decryptFilePage->setFileData(file);
             goToFileDecryption();

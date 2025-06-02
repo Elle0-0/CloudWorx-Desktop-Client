@@ -1,5 +1,6 @@
 #include "loginpage.h"
 #include "ui_loginpage.h"
+#include "network/authapi.h"
 #include "argon2id_utils.h"
 
 #include <QMessageBox>
@@ -35,17 +36,20 @@ void LoginPage::on_loginButton_clicked()
     QString username = ui->usernameTextField->text();
     QString password = ui->passwordTextField->text();
 
-    QString placeHolder = "$argon2id$v=19$m=12,t=3,p=1$xekKGWWnO1kqr2WZxoIudQ$LSndBzDryGPZYv/DU53KfpdESXQNPObrCozBjdJUBJw";
-    QByteArray passwordBytes = password.toUtf8();
+    AuthAPI api;
+    UserLoginModel loginResponse;
+    QString error;
+    bool success = api.loginUser(username, password, loginResponse, error);
 
-    if (!verifyPassword(passwordBytes, placeHolder)) {
-        QMessageBox::information(this, "error", "Incorrect Password");
+    if (!success) {
+        qWarning() << "Login failed:" << error;
         return;
+    } else {
+        qDebug() << "Login successful. Token: " << loginResponse.token;
     }
 
-    sodium_memzero(password.data(), password.size());
-    sodium_memzero(passwordBytes.data(), passwordBytes.size());
-
     emit goToDashboard();
+
+    sodium_memzero(password.data(), password.size());
 }
 

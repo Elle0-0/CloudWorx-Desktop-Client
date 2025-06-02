@@ -60,16 +60,11 @@ void SignUpPage::on_signUpButton_clicked()
     // Password is valid, continue with signup logic
     ui->errorMessage->clear();
 
-    // Convert to QByteArray for secure handling
-    QByteArray passwordBytes = password.toUtf8();
-    QString hashedPassword = hashPassword(passwordBytes);
+
+    emit signUpSuccessful(username, email, password);
 
     // Clear sensitive data from memory
-    sodium_memzero(passwordBytes.data(), passwordBytes.size());
     sodium_memzero(password.data(), password.size());
-
-
-    emit signUpSuccessful(username, email, hashedPassword);
 
 }
 
