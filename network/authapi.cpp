@@ -1,19 +1,13 @@
 #include "authapi.h"
+#include "../utils/apihelper.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QDebug>
 #include <curl/curl.h>
 
 AuthAPI::AuthAPI() {}
-
-size_t AuthAPI::writeCallback(void* contents, size_t size, size_t nmemb, void* userp)
-{
-    size_t totalSize = size * nmemb;
-    std::string* str = static_cast<std::string*>(userp);
-    str->append(static_cast<char*>(contents), totalSize);
-    return totalSize;
-}
 
 
 bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut)
@@ -30,6 +24,11 @@ bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut)
     json["public_key"] = model.public_key;
     json["iv_KEK"] = model.iv_KEK;
     json["encrypted_KEK"] = model.encrypted_KEK;
+    json["salt"] = model.salt;
+    json["p"] = model.p;
+    json["m"] = model.m;
+    json["t"] = model.t;
+
 
     QByteArray jsonData = QJsonDocument(json).toJson();
 
@@ -58,3 +57,231 @@ bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut)
     curl_easy_cleanup(curl);
     return success;
 }
+
+
+bool AuthAPI::loginUser(const QString& username, const QString& entered_auth_password,
+                        UserLoginModel& responseOut, QString& errorOut)
+{
+    CURL *curl = curl_easy_init();
+    if (!curl)
+        return false;
+
+    // Build JSON payload
+    QJsonObject json;
+    json["username"] = username;
+    json["entered_auth_password"] = entered_auth_password;
+
+    QByteArray jsonData = QJsonDocument(json).toJson();
+
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    std::string responseString;
+    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/login");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    CURLcode res = curl_easy_perform(curl);
+    bool success = false;
+
+    if (res == CURLE_OK) {
+        QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseString));
+        if (!doc.isObject()) {
+            errorOut = "Invalid JSON response";
+        } else {
+            QJsonObject obj = doc.object();
+            responseOut.token = obj["token"].toString();
+            responseOut.user_id = obj["user_id"].toString();
+
+            QJsonArray filesArray = obj["files"].toArray();
+            for (const QJsonValue& fileVal : filesArray) {
+                QJsonObject fileObj = fileVal.toObject();
+                FileModel file(
+                    fileObj["file_id"].toString(),
+                    fileObj["file_name"].toString(),
+                    fileObj["file_type"].toString(),
+                    fileObj["file_size"].toInt()
+                    );
+                responseOut.files.append(file);
+            }
+
+            success = true;
+        }
+    } else {
+        errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return success;
+}
+
+bool AuthAPI::changeAuthPassword(const QString username, const QString oldPassword, const QString newPassword , QString& responseOut)
+{
+    CURL *curl = curl_easy_init();
+    if (!curl)
+        return false;
+
+    QJsonObject json;
+    json["username"] = username;
+    json["old_auth_password"] = oldPassword;
+    json["new_auth_password"] = newPassword;
+
+    QByteArray jsonData = QJsonDocument(json).toJson();
+
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    std::string responseString;
+    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/auth-password");
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    CURLcode res = curl_easy_perform(curl);
+    bool success = false;
+
+    if (res == CURLE_OK) {
+        responseOut = QString::fromStdString(responseString);
+        success = true;
+    } else {
+        qWarning() << "curl error:" << curl_easy_strerror(res);
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return success;
+}
+
+bool AuthAPI::changeEncryptionPassword(const ChangeEncryptionPasswordModel& model, QString& responseOut)
+{
+    CURL *curl = curl_easy_init();
+    if (!curl)
+        return false;
+
+    // Create JSON body
+    QJsonObject json;
+    json["username"] = model.username;
+    json["old_password_derived_key"] = model.old_password_derived_key;
+    json["new_password_derived_key"] = model.new_password_derived_key;
+    json["new_iv_KEK"] = model.new_iv_KEK;
+    json["new_encrypted_KEK"] = model.new_encrypted_KEK;
+
+    QByteArray jsonData = QJsonDocument(json).toJson();
+
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    std::string responseString;
+    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/encryption-password");
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    CURLcode res = curl_easy_perform(curl);
+    bool success = false;
+
+    if (res == CURLE_OK) {
+        responseOut = QString::fromStdString(responseString);
+        success = true;
+    } else {
+        qWarning() << "curl error:" << curl_easy_strerror(res);
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return success;
+}
+
+bool AuthAPI::fetchAllUsers(QList<UserInfoModel>& usersOut, QString& errorOut)
+{
+    CURL *curl = curl_easy_init();
+    if (!curl)
+        return false;
+
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    std::string responseString;
+    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/users");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    CURLcode res = curl_easy_perform(curl);
+    bool success = false;
+
+    if (res == CURLE_OK) {
+        QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseString));
+        if (!doc.isObject()) {
+            errorOut = "Invalid JSON response";
+        } else {
+            QJsonObject obj = doc.object();
+            QJsonArray usersArray = obj["users"].toArray();
+            for (const QJsonValue& userVal : usersArray) {
+                QJsonObject userObj = userVal.toObject();
+                UserInfoModel user;
+                user.username = userObj["username"].toString();
+                user.email = userObj["email"].toString();
+                usersOut.append(user);
+            }
+            success = true;
+        }
+    } else {
+        errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return success;
+}
+bool AuthAPI::deleteUser(const QString userID, const QString password, QString& responseOut)
+{
+    CURL* curl = curl_easy_init();
+    if (!curl)
+        return false;
+
+    // Construct the endpoint URL with the user ID
+    QString endpoint = QString("http://gobbler.info:6174/api/auth/%1").arg(userID);
+
+    // JSON payload with password
+    QJsonObject json;
+    json["password"] = password;
+    QByteArray jsonData = QJsonDocument(json).toJson();
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    std::string responseString;
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint.toStdString().c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    CURLcode res = curl_easy_perform(curl);
+    bool success = false;
+
+    if (res == CURLE_OK) {
+        responseOut = QString::fromStdString(responseString);
+        success = true;
+    } else {
+        responseOut = QString("CURL error: ") + curl_easy_strerror(res);
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return success;
+}
+
