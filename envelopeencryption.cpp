@@ -11,7 +11,7 @@ KeyDerivationResult EnvelopeEncryption::deriveEncryptionKey(const QByteArray& pa
 
     KeyDerivationResult result;
 
-    // Generate random salt
+    // generate random salt
     unsigned char salt[crypto_pwhash_SALTBYTES];
     randombytes_buf(salt, sizeof salt);
     result.salt = QByteArray(reinterpret_cast<char*>(salt), sizeof salt);

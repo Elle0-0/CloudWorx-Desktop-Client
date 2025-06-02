@@ -26,6 +26,10 @@ bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, con
         model.auth_password = authPassword;
         model.iv_KEK = encodeBase64(kekResult.kekNonce);
         model.encrypted_KEK = encodeBase64(kekResult.wrappedKEK);
+        model.salt = kekResult.salt;
+        model.m = kekResult.memoryCost;
+        model.t = kekResult.timeCost;
+        model.p = 1;
 
         // hardcoded public key here
         model.public_key = QString("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQTRGVktiUHJiTkdBYWo3RDFUUFM2bDV5NEVFNGJ1SWFGdlF3c3VSampmSDg9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=");
@@ -276,8 +280,8 @@ UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& userId)
     data.username = "m";
     data.email = "m@m.com";
     data.authPassword = "$argon2id$v=19$m=12,t=3,p=1$xekKGWWnO1kqr2WZxoIudQ$LSndBzDryGPZYv/DU53KfpdESXQNPObrCozBjdJUBJw";
-    data.ivKEK = "8lDPwQf2BVLFPUZr";
-    data.encryptedKEK = "iL+UWqu2XmHPWvnkBLZ1v7/7UVGYejq3pPCYr37y+7+suT7TkE1i37nLR+sdbIfU";
+    data.ivKEK = "CIp2FJvDJ8cXGfK1";
+    data.encryptedKEK = "jcBZEydrou9Nf3msgbj/+hczHuoUCIHFKDgQAio0TXJsrkV9I3tjIShuxnqw5tWp";
     data.salt = "Zka8TscZPrLkAvqAqDln2A==";
     data.timeCost = 3;
     data.memoryCost = 12288;
