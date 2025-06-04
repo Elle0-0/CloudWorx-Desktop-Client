@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KeyGenPage</class>
+ <widget class="QWidget" name="KeyGenPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="downloadPrivButton">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>360</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Download</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>40</y>
+     <width>221</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Public and Private Key created!</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="publickey">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>150</y>
+     <width>641</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PUBLIC KEY</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="privatekey">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>280</y>
+     <width>641</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PRIVATE KEY</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downloadPubButton">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>240</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Download</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="contiButton">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>430</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Continue</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
