@@ -63,14 +63,14 @@ void FileUploadPage::on_encryptFileButton_clicked()
     try {
         QByteArray passwordBytes = password.toUtf8();
 
-        bool passwordVerification = EnvelopeEncryptionManager::verifyUserFilePassword("1", passwordBytes);
+        bool passwordVerification = EnvelopeEncryptionManager::verifyUserFilePassword(jwtToken, passwordBytes);
 
         if (!passwordVerification) {
             QMessageBox::critical(this, "Wrong Password", "password incorrect");
             return;
         }
 
-        QString fileEncryptedSuccess = EnvelopeEncryptionManager::encryptAndStoreFile("1", filePath, passwordBytes);
+        QString fileEncryptedSuccess = EnvelopeEncryptionManager::encryptAndStoreFile(userId, jwtToken, filePath, passwordBytes);
 
         QMessageBox::information(this, "Success", "File encrypted successfully");
 
@@ -86,23 +86,15 @@ void FileUploadPage::on_encryptFileButton_clicked()
 
 }
 
-// bool FileUploadPage::saveEncryptionResultToServer(const EnvelopeEncryptionResult& result)
-// {
-//     // Implement your server communication here
-//     // You'll need to send:
-//     // - result.salt, result.timeCost, result.memoryCost
-//     // - result.kekNonce, result.wrappedKEK
-//     // - result.dekNonce, result.wrappedDEK
-//     // - result.msgNonce, result.ciphertext
+void FileUploadPage::setIdAndToken(QString userId, QString jwtToken)
+{
+    this->jwtToken = jwtToken;
+    this->userId = userId;
+}
 
-//     // Example pseudo-code:
-//     // QNetworkRequest request(QUrl("https://your-server.com/api/upload-encrypted"));
-//     // QJsonObject json;
-//     // json["salt"] = QString(result.salt.toBase64());
-//     // json["timeCost"] = static_cast<int>(result.timeCost);
-//     // ... etc
-//     // return sendPostRequest(request, json);
 
-//     return true; // Placeholder
-// }
+void FileUploadPage::on_dashboardButton_clicked()
+{
+    emit backToDashboard();
+}
 
