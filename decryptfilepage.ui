@@ -71,6 +71,19 @@
     <string>Decrypt and save file</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="dashboardButton">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>440</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Back To Dashboard</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="Images.qrc"/>
