@@ -1,6 +1,8 @@
 #include "envelopeencryptionmanager.h"
 
 #include "network/authapi.h"
+#include "network/filesapi.h"
+#include "utils/keygenutils.h"
 
 #include "envelopeencryption.h"
 #include <QJsonObject>
@@ -10,15 +12,27 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QDebug>
+#include <QStandardPaths>
 #include <sodium.h>
 #include <QUrl>
 
-bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, const QString& email, const QString& authPassword, const QByteArray& filePassword)
+bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, const QString& email, const QString& authPassword,
+                                                    const QByteArray& filePassword, const QString publicKey, const QString privateKey)
 {
     try {
+        static bool sodiumInitialized = initializeSodium();
+        if (!sodiumInitialized) {
+            qWarning() << "Failed to initialize libsodium";
+            return false;
+        }
+
         // Generate KEK and wrap it with password-derived key
-        WrappedKEKResult kekResult = EnvelopeEncryption::generateAndWrapKEK(filePassword);
+        WrappedKEKResult kekResult = EnvelopeEncryption::generateAndWrapKEK(username, filePassword);
         qDebug() << "[setupUserEncryption] KEK generated and wrapped.";
+
+
+        QString pemBase64 = encodeBase64(publicKey.toUtf8());
+
 
         UserRegisterModel model;
         model.username = username;
@@ -26,20 +40,18 @@ bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, con
         model.auth_password = authPassword;
         model.iv_KEK = encodeBase64(kekResult.kekNonce);
         model.encrypted_KEK = encodeBase64(kekResult.wrappedKEK);
-        model.salt = kekResult.salt;
+        model.salt = encodeBase64(kekResult.salt);
         model.m = kekResult.memoryCost;
         model.t = kekResult.timeCost;
         model.p = 1;
+        model.public_key = pemBase64;
 
-        // hardcoded public key here
-        model.public_key = QString("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQTRGVktiUHJiTkdBYWo3RDFUUFM2bDV5NEVFNGJ1SWFGdlF3c3VSampmSDg9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=");
-
-        AuthAPI api;
         QString serverResponse;
-        bool success = api.registerUser(model, serverResponse);
+        QString error;
+        bool success = AuthAPI::registerUser(model, serverResponse, error);
 
         if (!success) {
-            qWarning() << "[setupUserEncryption] Registration failed. Server response:" << serverResponse;
+            qWarning() << "[setupUserEncryption] Registration failed. Server response:" << error;
             return false;
         }
 
@@ -53,19 +65,23 @@ bool EnvelopeEncryptionManager::setupUserEncryption(const QString& username, con
     }
 }
 
-bool EnvelopeEncryptionManager::verifyUserFilePassword(const QString& userId, const QByteArray& password)
+bool EnvelopeEncryptionManager::verifyUserFilePassword(const QString& token, const QByteArray& password)
 {
     try {
         // Fetch KEK data from server
-        UserKEKData kekData = fetchUserKEK(userId);
+        UserKEKData kekData = fetchUserKEK(token);
         if (kekData.encryptedKEK.isEmpty()) {
-            qDebug() << "No KEK found for user:" << userId;
+            qDebug() << "No KEK found for current user.";
             return false;
         }
 
+        qDebug() << "[DEBUG] salt string (before decoding):" << kekData.salt;
 
         // Try to derive PDK and unwrap KEK
         QByteArray salt = decodeBase64(kekData.salt);
+        qDebug() << "[DEBUG] Decoded salt hex:" << salt.toHex();
+        qDebug() << "[DEBUG] Decoded salt size:" << salt.size();
+
         QByteArray pdk = EnvelopeEncryption::deriveEncryptionKeyFromSalt(
             password, salt, kekData.timeCost, kekData.memoryCost);
 
@@ -98,7 +114,7 @@ bool EnvelopeEncryptionManager::verifyUserFilePassword(const QString& userId, co
     }
 }
 
-QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, const QString& filePath,
+QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, const QString& token, const QString& filePath,
                                                        const QByteArray& password)
 {
     try {
@@ -107,7 +123,7 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
         qDebug() << "[encryptAndStoreFile] File path:" << filePath;
 
         // Get user's KEK
-        QByteArray userKEK = getUserKEK(userId, password);
+        QByteArray userKEK = getUserKEK(token, password);
         if (userKEK.isEmpty()) {
             qDebug() << "Failed to get user KEK";
             return QString();
@@ -123,7 +139,7 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
         file.close();
 
         // Encrypt file with KEK
-        EnvelopeEncryptionResult encResult = EnvelopeEncryption::encryptWithKEK(fileData, userKEK);
+        EnvelopeEncryptionResult encResult = EnvelopeEncryption::encryptWithKEK(userId, file.fileName(), fileData, userKEK);
         qDebug() << "[encryptAndStoreFile] File encrypted.";
         qDebug() << "  ivFile:" << encodeBase64(encResult.msgNonce);
         qDebug() << "  ivDEK:" << encodeBase64(encResult.dekNonce);
@@ -151,9 +167,30 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
         qDebug() << "  encryptedDEK : " << fileDataObj.encryptedDEK;
         qDebug() << "  encryptedFile (Base64):" << encodeBase64(fileDataObj.encryptedFile);
 
-        //uncomment once implemented
-        bool fileSuccess = true;
-        //bool fileSuccess = sendFileData(fileDataObj);
+        QString tempEncryptedPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + fileDataObj.fileName;
+        QFile encryptedFile(tempEncryptedPath);
+        if (!encryptedFile.open(QIODevice::WriteOnly)) {
+            qDebug() << "Failed to write encrypted file to temp location.";
+            return QString();
+        }
+        encryptedFile.write(fileDataObj.encryptedFile);
+        encryptedFile.close();
+
+        QString response;
+        bool fileSuccess = FilesApi::uploadEncryptedFile(
+            token,
+            tempEncryptedPath,
+            fileDataObj.ivFile,
+            fileDataObj.fileType,
+            fileDataObj.fileSize,
+            fileDataObj.ivDEK,
+            fileDataObj.encryptedDEK,
+            response,
+            fileDataObj.fileName
+            );
+
+        // Remove temporary encrypted file
+        QFile::remove(tempEncryptedPath);
 
         // Clear sensitive data
         sodium_memzero(userKEK.data(), userKEK.size());
@@ -171,13 +208,12 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
     }
 }
 
-QByteArray EnvelopeEncryptionManager::decryptAndSaveFile(const QString& fileId, const QString& userId,
+QByteArray EnvelopeEncryptionManager::decryptAndSaveFile(const FileData fileData, const QString& token,
                                                    const QByteArray& password, const QString& outputPath)
 {
     try {
         // Fetch all required data from server
-        UserKEKData kekData = fetchUserKEK(userId);
-        FileData fileData = fetchFileData(fileId);
+        UserKEKData kekData = fetchUserKEK(token);
 
         if (kekData.encryptedKEK.isEmpty() || fileData.encryptedFile.isEmpty()) {
             qDebug() << "Missing data from server";
@@ -196,6 +232,16 @@ QByteArray EnvelopeEncryptionManager::decryptAndSaveFile(const QString& fileId, 
         input.msgNonce = decodeBase64(fileData.ivFile);
         input.ciphertext = fileData.encryptedFile;
 
+        qDebug() << "ivDEK:" << fileData.ivDEK;
+        qDebug() << "ivFile:" << fileData.ivFile;
+        qDebug() << "encryptedDEK:" << fileData.encryptedDEK;
+        qDebug() << "encryptedFile size:" << fileData.encryptedFile.size();
+
+        qDebug() << "salt:" << kekData.salt;
+        qDebug() << "ivKEK:" << kekData.ivKEK;
+        qDebug() << "encryptedKEK:" << kekData.encryptedKEK;
+
+
         // Decrypt and save
         return EnvelopeEncryption::decrypt(input, password);
 
@@ -205,11 +251,11 @@ QByteArray EnvelopeEncryptionManager::decryptAndSaveFile(const QString& fileId, 
     }
 }
 
-QByteArray EnvelopeEncryptionManager::getUserKEK(const QString& userId, const QByteArray& password)
+QByteArray EnvelopeEncryptionManager::getUserKEK(const QString& token, const QByteArray& password)
 {
     try {
         // Fetch KEK data from server
-        UserKEKData kekData = fetchUserKEK(userId);
+        UserKEKData kekData = fetchUserKEK(token);
         if (kekData.encryptedKEK.isEmpty()) {
             return QByteArray();
         }
@@ -265,39 +311,152 @@ bool EnvelopeEncryptionManager::sendFileData(const FileData& fileData)
     // return response.value("success").toBool();
 }
 
-UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& userId)
+// UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& userId)
+// {
+
+//     QJsonObject userJson;
+
+//     if (!AuthAPI::getUserInfo(userId, userJson)) {
+//         throw std::runtime_error("Failed to fetch user info from AuthAPI.");
+//     }
+
+//     qDebug() << "[fetchUserKEK] User JSON fetched successfully.";
+//     qDebug() << "[fetchUserKEK] JSON keys:" << userJson.keys();
+
+//     QString base64KEK = userJson.value("encrypted_KEK").toString();
+//     QString base64IV  = userJson.value("iv_KEK").toString();
+//     QString base64Salt = userJson.value("salt").toString();
+
+//     qDebug() << "[fetchUserKEK] Base64 KEK:" << base64KEK;
+//     qDebug() << "[fetchUserKEK] Base64 IV :" << base64IV;
+//     qDebug() << "[fetchUserKEK] Base64 Salt:" << base64Salt;
+
+//     // Decode base64-encoded fields
+//     QByteArray wrappedKEK = QByteArray::fromBase64(userJson.value("encrypted_KEK").toString().toUtf8());
+//     QByteArray kekNonce = QByteArray::fromBase64(userJson.value("iv_KEK").toString().toUtf8());
+//     QByteArray salt = QByteArray::fromBase64(userJson.value("salt").toString().toUtf8());
+
+//     qDebug() << "[fetchUserKEK] Decoded KEK size:" << wrappedKEK.size();
+//     qDebug() << "[fetchUserKEK] Decoded IV KEK size:" << kekNonce.size();
+//     qDebug() << "[fetchUserKEK] Decoded salt size:" << salt.size();
+
+//     // Extract Argon2 parameters
+//     bool okT, okM;
+//     quint32 timeCost = static_cast<quint32>(userJson["t"].toInt());
+//     quint32 memoryCost = static_cast<quint32>(userJson["m"].toInt());
+
+//     if (wrappedKEK.isEmpty() || kekNonce.isEmpty() || salt.isEmpty()) {
+//         throw std::runtime_error("Incomplete or invalid KEK data received.");
+//     }
+
+//     UserKEKData kekData;
+//     kekData.encryptedKEK = wrappedKEK;
+//     kekData.ivKEK = kekNonce;
+//     kekData.salt = salt;
+//     kekData.timeCost = timeCost;
+//     kekData.memoryCost = memoryCost;
+
+//     qDebug() << "[fetchUserKEK] KEK data prepared successfully.";
+//     return kekData;
+
+
+//     // // Simulated data
+//     // UserKEKData data;
+//     // data.username = "m";
+//     // data.email = "m@m.com";
+//     // data.authPassword = "$argon2id$v=19$m=12,t=3,p=1$xekKGWWnO1kqr2WZxoIudQ$LSndBzDryGPZYv/DU53KfpdESXQNPObrCozBjdJUBJw";
+//     // data.ivKEK = "CIp2FJvDJ8cXGfK1";
+//     // data.encryptedKEK = "jcBZEydrou9Nf3msgbj/+hczHuoUCIHFKDgQAio0TXJsrkV9I3tjIShuxnqw5tWp";
+//     // data.salt = "Zka8TscZPrLkAvqAqDln2A==";
+//     // data.timeCost = 3;
+//     // data.memoryCost = 12288;
+
+//     // return data;
+// }
+
+// UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& userId)
+// {
+//     UploadResult userInfo = AuthAPI::getUserInfo(userId);
+
+//     if (!userInfo.success) {
+//         throw std::runtime_error(QString("Failed to fetch user info: %1").arg(userInfo.errorMessage).toStdString());
+//     }
+
+//     qDebug() << "[fetchUserKEK] User info fetched successfully.";
+//     qDebug() << "[fetchUserKEK] UserID:" << userInfo.userId;
+//     qDebug() << "[fetchUserKEK] JSON keys: encrypted_KEK, iv_KEK, salt, t, m";
+
+//     // Base64 strings from userInfo
+//     QString base64KEK = userInfo.encryptedKEK;
+//     QString base64IV  = userInfo.ivKEK;
+//     QString base64Salt = userInfo.salt;
+
+//     qDebug() << "[fetchUserKEK] Base64 KEK:" << base64KEK;
+//     qDebug() << "[fetchUserKEK] Base64 IV :" << base64IV;
+//     qDebug() << "[fetchUserKEK] Base64 Salt:" << base64Salt;
+
+//     // Decode base64-encoded fields
+//     QByteArray wrappedKEK = QByteArray::fromBase64(base64KEK.toUtf8());
+//     QByteArray kekNonce = QByteArray::fromBase64(base64IV.toUtf8());
+//     // QByteArray salt = QByteArray::fromBase64(base64Salt.toUtf8());
+
+//     qDebug() << "[fetchUserKEK] Decoded KEK size:" << wrappedKEK.size();
+//     qDebug() << "[fetchUserKEK] Decoded IV KEK size:" << kekNonce.size();
+//     qDebug() << "[fetchUserKEK] Decoded salt size:" << salt.size();
+
+//     quint32 timeCost = static_cast<quint32>(userInfo.t);
+//     quint32 memoryCost = static_cast<quint32>(userInfo.m);
+
+//     if (wrappedKEK.isEmpty() || kekNonce.isEmpty() || salt.isEmpty()) {
+//         throw std::runtime_error("Incomplete or invalid KEK data received.");
+//     }
+
+//     UserKEKData kekData;
+//     kekData.encryptedKEK = wrappedKEK;
+//     kekData.ivKEK = userInfo.ivKEK;
+//     kekData.salt = userInfo.salt;
+//     kekData.timeCost = timeCost;
+//     kekData.memoryCost = memoryCost;
+
+//     qDebug() << "[fetchUserKEK] KEK data prepared successfully.";
+//     return kekData;
+// }
+UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& authToken)
 {
-    // QJsonObject response = makeRequest(QString("/api/user/kek/%1").arg(userId), "GET");
-    // if (response.value("success").toBool()) {
-    //     return UserKEKData::fromJson(response.value("data").toObject());
-    // }
-    // return UserKEKData(); // Empty if failed
+    QString error;
+    UploadResult userInfo = AuthAPI::getUserInfo(authToken, error);
 
-    qDebug() << "[fetchUserKEK] Simulating fetch for userId:" << userId;
+    if (!userInfo.success) {
+        throw std::runtime_error(QString("Failed to fetch user info: %1").arg(error).toStdString());
+    }
 
-    // Simulated data
-    UserKEKData data;
-    data.username = "m";
-    data.email = "m@m.com";
-    data.authPassword = "$argon2id$v=19$m=12,t=3,p=1$xekKGWWnO1kqr2WZxoIudQ$LSndBzDryGPZYv/DU53KfpdESXQNPObrCozBjdJUBJw";
-    data.ivKEK = "CIp2FJvDJ8cXGfK1";
-    data.encryptedKEK = "jcBZEydrou9Nf3msgbj/+hczHuoUCIHFKDgQAio0TXJsrkV9I3tjIShuxnqw5tWp";
-    data.salt = "Zka8TscZPrLkAvqAqDln2A==";
-    data.timeCost = 3;
-    data.memoryCost = 12288;
+    UserKEKData kekData;
+    kekData.userId = userInfo.userId;
+    kekData.username = userInfo.username;
+    kekData.email = userInfo.email;
+    kekData.ivKEK = userInfo.ivKEK;
+    kekData.encryptedKEK = userInfo.encryptedKEK;
+    kekData.salt = userInfo.salt;
+    kekData.timeCost = static_cast<quint32>(userInfo.t);
+    kekData.memoryCost = static_cast<quint32>(userInfo.m);
 
-    return data;
+    return kekData;
 }
 
 
-FileData EnvelopeEncryptionManager::fetchFileData(const QString& fileId)
-{
-    // QJsonObject response = makeRequest(QString("/api/file/data/%1").arg(fileId), "GET");
-    // if (response.value("success").toBool()) {
-    //     return FileData::fromJson(response.value("data").toObject());
-    // }
-    // return FileData(); // Empty if failed
-}
+// FileData EnvelopeEncryptionManager::fetchFileData(const QString& fileId)
+// {
+//     qDebug() << "[fetchFileData] Fetching file data for fileId:" << fileId;
+
+//     FileData data;
+//     // Fill it with dummy safe values for now
+//     data.fileContents = QByteArray(); // Empty contents
+//     data.iv = QByteArray();           // Empty IV
+//     data.associatedData = QByteArray(); // Empty AAD
+
+//     return data;
+// }
+
 
 // JSON conversion implementations
 QJsonObject UserKEKData::toJson() const
@@ -349,10 +508,12 @@ FileData FileData::fromJson(const QJsonObject& json)
     data.fileSize = json["file_size"].toInt();
     data.ivFile = json["iv_file"].toString();
     data.ivDEK = json["iv_dek"].toString();
-    data.encryptedFile = QByteArray::fromBase64(json["encrypted_file"].toString().toUtf8());
     data.encryptedDEK = json["encrypted_dek"].toString();
+    data.encryptedFile = QByteArray::fromBase64(json["encrypted_file"].toString().toUtf8());
+    data.assocDataFile = json["assoc_data_file"].toString();
     return data;
 }
+
 
 
 // Utility functions

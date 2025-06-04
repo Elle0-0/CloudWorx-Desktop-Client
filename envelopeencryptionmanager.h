@@ -11,9 +11,11 @@
 #include <QDebug>
 #include <QUrl>
 
+
 // JSON data structures matching your database schema
 struct UserKEKData {
 
+    QString userId;
     QString username;
     QString authPassword;
     QString email;
@@ -31,6 +33,7 @@ struct UserKEKData {
 
 
 struct FileData {
+    QString fileid;
     QString fileName;
     QString fileType;
     int fileSize;
@@ -52,19 +55,20 @@ public:
     explicit EnvelopeEncryptionManager(const QString& serverUrl, QObject* parent = nullptr);
 
     // User setup - creates KEK and sends to server
-    static bool setupUserEncryption(const QString& username, const QString& email, const QString& authPassword, const QByteArray& filePassword);
+    static bool setupUserEncryption(const QString& username, const QString& email, const QString& authPassword,
+                                    const QByteArray& filePassword, const QString publicKey, const QString privateKey);
 
     // Password verification - fetches KEK from server and tries to unwrap
-    static bool verifyUserFilePassword(const QString& userId, const QByteArray& password);
+    static bool verifyUserFilePassword(const QString& token, const QByteArray& password);
 
     // File operations
-    static QString encryptAndStoreFile(const QString& userId, const QString& filePath,
-                                const QByteArray& password);
-    static QByteArray decryptAndSaveFile(const QString& fileId, const QString& userId,
+    static QString encryptAndStoreFile(const QString& userId, const QString& token, const QString& filePath,
+                                       const QByteArray& password);
+    static QByteArray decryptAndSaveFile(const FileData file, const QString& userId,
                             const QByteArray& password, const QString& outputPath);
 
     // Helper functions
-    static QByteArray getUserKEK(const QString& userId, const QByteArray& password);
+    static QByteArray getUserKEK(const QString& token, const QByteArray& password);
 
 private:
 
@@ -72,7 +76,7 @@ private:
     static bool sendUserKEK(const UserKEKData& kekData);
     static bool sendFileData(const FileData& fileData);
 
-    static UserKEKData fetchUserKEK(const QString& userId);
+    static UserKEKData fetchUserKEK(const QString& authToken);
     static FileData fetchFileData(const QString& fileId);
 
 
