@@ -2,15 +2,16 @@
 #include "../utils/apihelper.h"
 
 #include <QJsonDocument>
-#include <QJsonObject>
 #include <QJsonArray>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QFile>
 #include <curl/curl.h>
 
 AuthAPI::AuthAPI() {}
 
 
-bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut)
+bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut, QString& errorOut)
 {
     CURL *curl = curl_easy_init();
     if (!curl)
@@ -36,12 +37,19 @@ bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut)
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string responseString;
-    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/register");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/register");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return false;
+    }
 
     CURLcode res = curl_easy_perform(curl);
     bool success = false;
@@ -77,12 +85,28 @@ bool AuthAPI::loginUser(const QString& username, const QString& entered_auth_pas
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string responseString;
-    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/login");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/login");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    // QString certPath = QCoreApplication::applicationDirPath() + "/certs/cacert.pem";
+    // if (!QFile::exists(certPath)) {
+    //     qWarning() << "CA cert file not found at:" << certPath;
+    // }
+
+    // curl_easy_setopt(curl, CURLOPT_CAINFO, certPath.toStdString().c_str());
+
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
+
 
     CURLcode res = curl_easy_perform(curl);
     bool success = false;
@@ -119,7 +143,7 @@ bool AuthAPI::loginUser(const QString& username, const QString& entered_auth_pas
     return success;
 }
 
-bool AuthAPI::changeAuthPassword(const QString username, const QString oldPassword, const QString newPassword , QString& responseOut)
+bool AuthAPI::changeAuthPassword(const QString username, const QString oldPassword, const QString newPassword , QString& responseOut, QString& errorOut)
 {
     CURL *curl = curl_easy_init();
     if (!curl)
@@ -136,13 +160,21 @@ bool AuthAPI::changeAuthPassword(const QString username, const QString oldPasswo
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string responseString;
-    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/auth-password");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/auth-password");
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
 
     CURLcode res = curl_easy_perform(curl);
     bool success = false;
@@ -159,7 +191,7 @@ bool AuthAPI::changeAuthPassword(const QString username, const QString oldPasswo
     return success;
 }
 
-bool AuthAPI::changeEncryptionPassword(const ChangeEncryptionPasswordModel& model, QString& responseOut)
+bool AuthAPI::changeEncryptionPassword(const ChangeEncryptionPasswordModel& model, QString& responseOut, QString& errorOut)
 {
     CURL *curl = curl_easy_init();
     if (!curl)
@@ -179,13 +211,21 @@ bool AuthAPI::changeEncryptionPassword(const ChangeEncryptionPasswordModel& mode
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string responseString;
-    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/encryption-password");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/encryption-password");
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
 
     CURLcode res = curl_easy_perform(curl);
     bool success = false;
@@ -212,10 +252,18 @@ bool AuthAPI::fetchAllUsers(QList<UserInfoModel>& usersOut, QString& errorOut)
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string responseString;
-    curl_easy_setopt(curl, CURLOPT_URL, "http://gobbler.info:6174/api/auth/users");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/users");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
 
     CURLcode res = curl_easy_perform(curl);
     bool success = false;
@@ -244,14 +292,14 @@ bool AuthAPI::fetchAllUsers(QList<UserInfoModel>& usersOut, QString& errorOut)
     curl_easy_cleanup(curl);
     return success;
 }
-bool AuthAPI::deleteUser(const QString userID, const QString password, QString& responseOut)
+bool AuthAPI::deleteUser(const QString userID, const QString password, QString& responseOut, QString& errorOut)
 {
     CURL* curl = curl_easy_init();
     if (!curl)
         return false;
 
     // Construct the endpoint URL with the user ID
-    QString endpoint = QString("http://gobbler.info:6174/api/auth/%1").arg(userID);
+    QString endpoint = QString("https://networkninjas.gobbler.info/api/auth/%1").arg(userID);
 
     // JSON payload with password
     QJsonObject json;
@@ -270,6 +318,14 @@ bool AuthAPI::deleteUser(const QString userID, const QString password, QString& 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
 
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
+
     CURLcode res = curl_easy_perform(curl);
     bool success = false;
 
@@ -284,4 +340,91 @@ bool AuthAPI::deleteUser(const QString userID, const QString password, QString& 
     curl_easy_cleanup(curl);
     return success;
 }
+
+UploadResult AuthAPI::getUserInfo(const QString& authToken, QString& errorOut)
+{
+    UploadResult result;
+
+    CURL *curl = curl_easy_init();
+    if (!curl) {
+        result.success = false;
+        result.errorMessage = "Failed to initialize CURL";
+        return result;
+    }
+
+    QString url = QString("https://networkninjas.gobbler.info/api/auth/user_info");
+
+    qDebug() << "[getUserInfo] Called";
+
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Accept: application/json");
+    headers = curl_slist_append(headers, QString("Authorization: Bearer " + authToken).toStdString().c_str());
+
+    std::string responseString;
+    curl_easy_setopt(curl, CURLOPT_URL, url.toStdString().c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
+
+    qDebug() << "[getUserInfo] Fetching URL:" << url;
+
+    if (!setCurlCACert(curl)) {
+        errorOut = "Failed to set CA cert.";
+        result.success = false;
+        result.errorMessage = errorOut;
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return result;
+    }
+
+    CURLcode res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK) {
+        result.success = false;
+        result.errorMessage = QString("CURL error: %1").arg(curl_easy_strerror(res));
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return result;
+    }
+
+    // Parse JSON response
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseString), &parseError);
+
+    if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
+        result.success = false;
+        result.errorMessage = QString("JSON parse error: %1").arg(parseError.errorString());
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return result;
+    }
+
+    QJsonObject obj = doc.object();
+
+    // Map JSON fields to struct
+    result.userId = obj.value("user_id").toString();
+    result.username = obj.value("username").toString();
+    result.email = obj.value("email").toString();
+    result.publicKey = obj.value("public_key").toString();
+    result.createdAt = obj.value("created_at").toString();
+    result.modifiedAt = obj.value("modified_at").toString();
+    result.keyId = obj.value("key_id").toString();
+    result.ivKEK = obj.value("iv_KEK").toString();
+    result.encryptedKEK = obj.value("encrypted_KEK").toString();
+    result.assocDataKEK = obj.value("assoc_data_KEK").toString();
+    result.salt = obj.value("salt").toString();
+    result.p = obj.value("p").toInt();
+    result.m = obj.value("m").toInt();
+    result.t = obj.value("t").toInt();
+    result.kekCreatedAt = obj.value("kek_created_at").toString();
+
+    result.success = true;
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+
+    return result;
+}
+
+
 

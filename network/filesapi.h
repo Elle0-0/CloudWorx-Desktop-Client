@@ -20,12 +20,14 @@ struct FileInfo {
     DEKData dek_data;
 };
 
+
 class FilesApi
 {
 public:
     FilesApi();
     static bool getFiles(const QString& authToken, QList<FileInfo>& filesOut, int& countOut, QString& errorOut);
-    bool uploadEncryptedFile(const QString& filePath,
+    static bool uploadEncryptedFile(const QString& authToken,
+                                    const QString& filePath,
                              const QString& ivFile,
                              const QString& fileType,
                              qint64 fileSize,
@@ -33,6 +35,10 @@ public:
                              const QString& encryptedDEK,
                              QString& responseOut,
                              const QString& customFileName = "");
+    static bool getAllFiles(QString& responseOut, const QString& fieldsMask);
+    static bool resolveFileId(const QString& fileName, QString& fileIdOut);
+    static bool deleteFileByName(const QString& fileName, QString& responseOut);
+    static bool downloadEncryptedFileToMemory(const QString& authToken, const QString& fileName, QByteArray& fileDataOut, QString& errorOut);
 };
 
 #endif // FILESAPI_H
