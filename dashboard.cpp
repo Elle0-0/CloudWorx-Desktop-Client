@@ -1,6 +1,8 @@
 #include "dashboard.h"
 #include "ui_dashboard.h"
 #include "models/filelistmodel.h"
+#include "network/filesapi.h"
+
 
 #include <QMessageBox>
 #include <curl/curl.h>
@@ -17,13 +19,17 @@ Dashboard::Dashboard(QWidget *parent)
     ui->tabWidget->setTabText(2, "Shared");
     ui->tabWidget->setTabText(3, "Shared with me");
 
-    model->addFile(FileModel("uuid1", "Report.pdf", "PDF", 2048));
-    model->addFile(FileModel("uuid2", "Photo.jpg", "Image", 5120));
-    model->addFile(FileModel("uuid3", "Notes.txt", "Text", 128));
-
     ui->listView->setModel(model);
 
 }
+
+
+Dashboard::~Dashboard()
+{
+    delete ui;
+}
+
+
 void Dashboard::on_decryptFileButton_clicked()
 {
     QModelIndex index = ui->listView->currentIndex();
@@ -32,16 +38,20 @@ void Dashboard::on_decryptFileButton_clicked()
         return;
     }
 
-    const FileModel &file = model->getFile(index.row());
+    FileData file = model->getFile(index.row());
 
-    emit goToFileDecryption(file);
+    QByteArray encryptedFile;
+    QString error;
+    if (!FilesApi::downloadEncryptedFileToMemory(jwtToken, file.fileName, encryptedFile, error)) {
+        QMessageBox::critical(this, "Download Failed", error);
+        return;
+    }
+
+    file.encryptedFile = encryptedFile;
+
+    emit goToFileDecryption(file, jwtToken);
 }
 
-
-Dashboard::~Dashboard()
-{
-    delete ui;
-}
 
 
 
@@ -53,8 +63,50 @@ void Dashboard::on_shareFileButton_clicked()
         return;
     }
 
-    const FileModel &file = model->getFile(index.row());
+    const FileData &file = model->getFile(index.row());
 
-    emit goToFileShare(file.file_id);
+    emit goToFileShare(file.fileid);
+}
+
+void Dashboard::setIdAndToken(QString userId, QString jwtToken)
+{
+    this->jwtToken = jwtToken;
+    this->userId = userId;
+    loadFiles();
+}
+
+void Dashboard::loadFiles()
+{
+    QList<FileInfo> files;
+    int count = 0;
+    QString error;
+
+    if (!FilesApi::getFiles(jwtToken, files, count, error)) {
+        QMessageBox::critical(this, "Failed to Load Files", error);
+        return;
+    }
+
+    model->clear();
+
+    for (const FileInfo &info : files) {
+        FileData data;
+        data.fileName = info.file_name;
+        data.fileType = QFileInfo(info.file_name).suffix();
+        data.fileSize = 0; // You don’t know size yet (encrypted file not downloaded)
+        data.ivFile = info.iv_file;
+        data.ivDEK = info.dek_data.iv_dek;
+        data.encryptedDEK = info.dek_data.encrypted_dek;
+        data.assocDataFile = info.assoc_data_file;
+        // Leave data.encryptedFile empty for now
+
+        model->addFile(data);
+    }
+}
+
+
+
+void Dashboard::on_uploadFileButton_clicked()
+{
+    emit goToFileUpload(userId, jwtToken);
 }
 
