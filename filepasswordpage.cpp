@@ -2,9 +2,11 @@
 #include "ui_filepasswordpage.h"
 #include "argon2id_utils.h"
 #include "envelopeencryptionmanager.h"
+#include "utils/keygenutils.h"
 
 #include <QMessageBox>
 #include <sodium.h>
+#include <QString>
 
 FilePasswordPage::FilePasswordPage(QWidget *parent)
     : QWidget(parent)
@@ -50,14 +52,25 @@ void FilePasswordPage::on_createPasswordButton_clicked()
 
     QByteArray passwordBytes = password.toUtf8();
 
-    bool success = EnvelopeEncryptionManager::setupUserEncryption(username, email, password, passwordBytes);
+    GeneratedKeypair keypair = generateAndExportX25519Keypair();
+    if (!keypair.success) {
+        QMessageBox::warning(this, "KeyGen Error", "Failed to generate keys");
+        return;
+    }
+
+    qDebug() << "Public Key (PEM):\n" << keypair.publicKeyPEM;
+    qDebug() << "Private Key (PEM):\n" << keypair.privateKeyPEM;
+
+    bool success = EnvelopeEncryptionManager::setupUserEncryption(username, email, password, passwordBytes,
+                                                                  keypair.publicKeyPEM, keypair.privateKeyPEM);
+
 
     if (!success) {
         qDebug() << "error";
         return;
     }else {
         qDebug() << "User file password set";
-        emit goToLogin();
+        emit goToKeyGen(keypair.publicKeyPEM, keypair.privateKeyPEM);
     }
 
     // Clear sensitive data from memory
