@@ -7,6 +7,7 @@
 #include "dashboard.h"
 #include "decryptfilepage.h"
 #include "sharefilepage.h"
+#include "keygenpage.h"
 
 #include <QMainWindow>
 
@@ -42,6 +43,8 @@ private slots:
 
     void goToFileShare();
 
+    void goToKenGen();
+
 
 private:
     Ui::MainWindow *ui;
@@ -52,5 +55,6 @@ private:
     Dashboard *dashboardPage;
     DecryptFilePage *decryptFilePage;
     ShareFilePage *shareFilepage;
+    KeyGenPage *keyGenPage;
 };
 #endif // MAINWINDOW_H

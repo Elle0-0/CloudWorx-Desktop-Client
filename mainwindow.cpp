@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     dashboardPage = new Dashboard(this);
     decryptFilePage = new DecryptFilePage(this);
     shareFilepage = new ShareFilePage(this);
+    keyGenPage = new KeyGenPage(this);
 
     ui->stackedWidget->addWidget(loginPage);
     ui->stackedWidget->addWidget(signUpPage);
@@ -22,26 +23,38 @@ MainWindow::MainWindow(QWidget *parent)
     ui->stackedWidget->addWidget(dashboardPage);
     ui->stackedWidget->addWidget(decryptFilePage);
     ui->stackedWidget->addWidget(shareFilepage);
+    ui->stackedWidget->addWidget(keyGenPage);
 
     connect(ui->loginButton, &QPushButton::clicked, this, &MainWindow::goToLogin);
     connect(ui->signUpButton, &QPushButton::clicked, this, &MainWindow::goToSignUp);
     connect(ui->uploadFileButton, &QPushButton::clicked, this, &MainWindow::goToFileUpload);
     connect(loginPage, &LoginPage::backToMenu, this, &MainWindow::goToMenu);
     connect(signUpPage, &SignUpPage::backToMenu, this, &MainWindow::goToMenu);
-    connect(loginPage, &LoginPage::goToDashboard, this, &MainWindow::goToDashboard);
-    connect(filePasswordPage, &FilePasswordPage::goToLogin, this, &MainWindow::goToLogin);
+    connect(filePasswordPage, &FilePasswordPage::goToKeyGen, this, &MainWindow::goToKenGen);
+    connect(decryptFilePage, &DecryptFilePage::backToDashboard, this, &MainWindow::goToDashboard);
+    connect(fileUploadPage, &FileUploadPage::backToDashboard, this, &MainWindow::goToDashboard);
+    connect(shareFilepage, &ShareFilePage::backToDashboard, this, &MainWindow::goToDashboard);
+    connect(keyGenPage, &KeyGenPage::goToLogin, this, &MainWindow::goToLogin);
 
     connect(signUpPage, &SignUpPage::signUpSuccessful, this, [=](const QString &username, const QString &email, const QString &hashedPassword) {
         filePasswordPage->setUserData(username, email, hashedPassword);
         goToFilePassword();
     });
-    connect(dashboardPage, &Dashboard::goToFileDecryption, this, [=](const FileModel &file){
-            decryptFilePage->setFileData(file);
+    connect(dashboardPage, &Dashboard::goToFileDecryption, this, [=](const FileData &file, QString jwtToken){
+            decryptFilePage->setFileData(file, jwtToken);
             goToFileDecryption();
     });
-    connect(dashboardPage, &Dashboard::goToFileShare, this, [=](QString file_id){
-        shareFilepage->setFileId(file_id);
-        goToFileShare();
+    connect(dashboardPage, &Dashboard::goToFileUpload, this, [=](QString userId, QString jwtToken){
+        fileUploadPage->setIdAndToken(userId, jwtToken);
+        goToFileUpload();
+    });
+    connect(filePasswordPage, &FilePasswordPage::goToKeyGen, this, [=](const QString pub, QString priv){
+        keyGenPage->setPubAndPriv(pub, priv);
+        goToKenGen();
+    });
+    connect(loginPage, &LoginPage::goToDashboard, this, [=](QString userId, QString jwtToken){
+        dashboardPage->setIdAndToken(userId, jwtToken);
+        goToDashboard();
     });
 
 }
@@ -77,5 +90,8 @@ void MainWindow::goToFileDecryption(){
 }
 void MainWindow::goToFileShare() {
     ui->stackedWidget->setCurrentWidget(shareFilepage);
+}
+void MainWindow::goToKenGen() {
+    ui->stackedWidget->setCurrentWidget(keyGenPage);
 }
 
