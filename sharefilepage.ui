@@ -107,6 +107,19 @@
     <string>Share access</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="dashboardButton">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>430</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Go to Dashboard</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="Images.qrc"/>

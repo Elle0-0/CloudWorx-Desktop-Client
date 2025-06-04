@@ -16,3 +16,9 @@ ShareFilePage::~ShareFilePage()
 void ShareFilePage::setFileId(const QString file_id) {
     this->file_id = file_id;
 }
+
+void ShareFilePage::on_dashboardButton_clicked()
+{
+    emit backToDashboard();
+}
+

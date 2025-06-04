@@ -16,9 +16,15 @@ public:
     void setFileId(const QString file_id);
     ~ShareFilePage();
 
+private slots:
+    void on_dashboardButton_clicked();
+
 private:
     Ui::ShareFilePage *ui;
     QString file_id;
+
+signals:
+    void backToDashboard();
 };
 
 #endif // SHAREFILEPAGE_H
