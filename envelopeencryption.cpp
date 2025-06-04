@@ -4,6 +4,25 @@
 #include <QFile>
 #include <QDebug>
 
+//HELPER FUNCTIONS WOOO
+QByteArray sha256First12Bytes(const QByteArray& data) {
+    unsigned char hash[crypto_hash_sha256_BYTES];
+    crypto_hash_sha256(hash, reinterpret_cast<const unsigned char*>(data.constData()), data.size());
+    return QByteArray(reinterpret_cast<char*>(hash), 12); // First 12 bytes
+}
+
+QByteArray generateRandomBytes(int length) {
+    if (sodium_init() < 0) {
+        throw std::runtime_error("libsodium initialization failed.");
+    }
+
+    QByteArray bytes(length, 0);
+    randombytes_buf(bytes.data(), bytes.size());
+    return bytes;
+}
+
+
+
 KeyDerivationResult EnvelopeEncryption::deriveEncryptionKey(const QByteArray& password) {
     if (sodium_init() < 0) {
         throw std::runtime_error("libsodium init failed!");
@@ -67,7 +86,7 @@ QByteArray EnvelopeEncryption::deriveEncryptionKeyFromSalt(const QByteArray& pas
 
 
 
-WrappedKEKResult EnvelopeEncryption::generateAndWrapKEK(const QByteArray& password) {
+WrappedKEKResult EnvelopeEncryption::generateAndWrapKEK(const QString username, const QByteArray& password) {
     if (sodium_init() < 0) {
         throw std::runtime_error("libsodium initialization failed.");
     }
@@ -79,9 +98,13 @@ WrappedKEKResult EnvelopeEncryption::generateAndWrapKEK(const QByteArray& passwo
     unsigned char kek[crypto_aead_aes256gcm_KEYBYTES];
     randombytes_buf(kek, sizeof kek);
 
-    // Step 3: Wrap KEK with PDK
-    QByteArray kekNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
-    randombytes_buf(kekNonce.data(), kekNonce.size());
+
+    QByteArray kekNonce = sha256First12Bytes(username.toUtf8() + generateRandomBytes(12));
+
+
+    // // Step 3: Wrap KEK with PDK
+    // QByteArray kekNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
+    // randombytes_buf(kekNonce.data(), kekNonce.size());
 
     QByteArray wrappedKEK(sizeof kek + crypto_aead_aes256gcm_ABYTES, 0);
     unsigned long long wrappedKEKLen;
@@ -107,7 +130,8 @@ WrappedKEKResult EnvelopeEncryption::generateAndWrapKEK(const QByteArray& passwo
 }
 
 
-EnvelopeEncryptionResult EnvelopeEncryption::encryptWithKEK(const QByteArray& plaintext, const QByteArray& kek) {
+EnvelopeEncryptionResult EnvelopeEncryption::encryptWithKEK(const QString userid, const QString fileName,
+                                                            const QByteArray& plaintext, const QByteArray& kek) {
     if (sodium_init() < 0) {
         throw std::runtime_error("libsodium initialization failed.");
     }
@@ -133,9 +157,11 @@ EnvelopeEncryptionResult EnvelopeEncryption::encryptWithKEK(const QByteArray& pl
         throw std::runtime_error("File encryption failed.");
     }
 
-    // Step 3: Wrap DEK with KEK
-    QByteArray dekNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
-    randombytes_buf(dekNonce.data(), dekNonce.size());
+    // // Step 3: Wrap DEK with KEK
+    // QByteArray dekNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
+    // randombytes_buf(dekNonce.data(), dekNonce.size());
+
+    QByteArray dekNonce = sha256First12Bytes(userid.toUtf8() + fileName.toUtf8() + generateRandomBytes(12));
 
     QByteArray wrappedDEK(sizeof dek + crypto_aead_aes256gcm_ABYTES, 0);
     unsigned long long wrappedDEKLen;
@@ -177,6 +203,14 @@ QByteArray EnvelopeEncryption::decrypt(const EnvelopeDecryptionInput& input, con
     unsigned char kek[crypto_aead_aes256gcm_KEYBYTES];
     unsigned long long kekLen;
 
+    if (input.kekNonce.size() != crypto_aead_aes256gcm_NPUBBYTES) {
+        throw std::runtime_error("Invalid KEK nonce size.");
+    }
+    if (input.wrappedKEK.size() <= crypto_aead_aes256gcm_ABYTES) {
+        throw std::runtime_error("Invalid wrapped KEK size.");
+    }
+
+
     if (crypto_aead_aes256gcm_decrypt(
             kek, &kekLen,
             nullptr,
@@ -192,6 +226,14 @@ QByteArray EnvelopeEncryption::decrypt(const EnvelopeDecryptionInput& input, con
     // Step 3: Unwrap DEK with KEK
     unsigned char dek[crypto_aead_aes256gcm_KEYBYTES];
     unsigned long long dekLen;
+
+    if (input.dekNonce.size() != crypto_aead_aes256gcm_NPUBBYTES) {
+        throw std::runtime_error("Invalid DEK nonce size.");
+    }
+    if (input.wrappedDEK.size() <= crypto_aead_aes256gcm_ABYTES) {
+        throw std::runtime_error("Invalid wrapped DEK size.");
+    }
+
 
     if (crypto_aead_aes256gcm_decrypt(
             dek, &dekLen,
@@ -209,6 +251,14 @@ QByteArray EnvelopeEncryption::decrypt(const EnvelopeDecryptionInput& input, con
     // Step 4: Decrypt message with DEK
     QByteArray plaintext(input.ciphertext.size(), 0);
     unsigned long long plaintextLen;
+
+    if (input.msgNonce.size() != crypto_aead_aes256gcm_NPUBBYTES) {
+        throw std::runtime_error("Invalid message nonce size.");
+    }
+    if (input.ciphertext.size() <= crypto_aead_aes256gcm_ABYTES) {
+        throw std::runtime_error("Invalid ciphertext size.");
+    }
+
 
     if (crypto_aead_aes256gcm_decrypt(
             reinterpret_cast<unsigned char*>(plaintext.data()), &plaintextLen,
@@ -233,34 +283,3 @@ QByteArray EnvelopeEncryption::decrypt(const EnvelopeDecryptionInput& input, con
 }
 
 
-
-bool EnvelopeEncryption::decryptFile(const EnvelopeDecryptionInput& input, const QByteArray& password,
-                                     const QString& outputPath)
-{
-    try {
-        // Decrypt the file data
-        QByteArray decryptedData = decrypt(input, password);
-
-        // Write to output file
-        QFile outFile(outputPath);
-        if (!outFile.open(QIODevice::WriteOnly)) {
-            qDebug() << "Failed to open output file for writing:" << outputPath;
-            return false;
-        }
-
-        qint64 bytesWritten = outFile.write(decryptedData);
-        outFile.close();
-
-        if (bytesWritten != decryptedData.size()) {
-            qDebug() << "Failed to write all data to file. Expected:" << decryptedData.size()
-                     << "Written:" << bytesWritten;
-            return false;
-        }
-
-        return true;
-
-    } catch (const std::exception& e) {
-        qDebug() << "Decryption failed:" << e.what();
-        return false;
-    }
-}

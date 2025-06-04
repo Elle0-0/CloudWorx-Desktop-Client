@@ -56,14 +56,13 @@ public:
                                                   quint32 memoryCost);
 
     // Encryption/Decryption functions
-    static WrappedKEKResult generateAndWrapKEK(const QByteArray& password);
-    static EnvelopeEncryptionResult encryptWithKEK(const QByteArray& plaintext, const QByteArray& kek);
+    static WrappedKEKResult generateAndWrapKEK(const QString username, const QByteArray& password);
+    static EnvelopeEncryptionResult encryptWithKEK(const QString userid, const QString fileName,
+                                                   const QByteArray& plaintext, const QByteArray& kek);
     static QByteArray decrypt(const EnvelopeDecryptionInput& input, const QByteArray& password);
 
     // File operations
     static EnvelopeEncryptionResult encryptFile(const QString& filePath, const QByteArray& password);
-    static bool decryptFile(const EnvelopeDecryptionInput& input, const QByteArray& password,
-                            const QString& outputPath);
 };
 
 #endif // ENVELOPEENCRYPTION_H
