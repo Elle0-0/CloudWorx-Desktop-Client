@@ -1,10 +1,10 @@
 #include "loginpage.h"
 #include "ui_loginpage.h"
 #include "network/authapi.h"
-#include "argon2id_utils.h"
 
 #include <QMessageBox>
 #include <sodium.h>
+#include <QString>
 
 
 LoginPage::LoginPage(QWidget *parent)
@@ -36,19 +36,19 @@ void LoginPage::on_loginButton_clicked()
     QString username = ui->usernameTextField->text();
     QString password = ui->passwordTextField->text();
 
-    AuthAPI api;
     UserLoginModel loginResponse;
     QString error;
-    bool success = api.loginUser(username, password, loginResponse, error);
+    bool success = AuthAPI::loginUser(username, password, loginResponse, error);
 
     if (!success) {
         qWarning() << "Login failed:" << error;
         return;
     } else {
+        qDebug() << "Login successful. usernID: " << loginResponse.user_id;
         qDebug() << "Login successful. Token: " << loginResponse.token;
+        emit goToDashboard(loginResponse.user_id, loginResponse.token);
     }
 
-    emit goToDashboard();
 
     sodium_memzero(password.data(), password.size());
 }

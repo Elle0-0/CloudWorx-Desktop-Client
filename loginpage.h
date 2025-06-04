@@ -28,7 +28,7 @@ private:
 signals:
     void backToMenu();
 
-    void goToDashboard();
+    void goToDashboard(QString userId, QString jwtToken);
 };
 
 #endif // LOGINPAGE_H
