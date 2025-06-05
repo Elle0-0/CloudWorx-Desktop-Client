@@ -43,6 +43,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         utils/ApiHelper.h
         utils/keygenutils.h utils/keygenutils.cpp
         keygenpage.h keygenpage.cpp keygenpage.ui
+        cryptography/hybridencryptionmanager.h cryptography/hybridencryptionmanager.cpp
+        network/sharesapi.h network/sharesapi.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
