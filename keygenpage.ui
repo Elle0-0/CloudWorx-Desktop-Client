@@ -16,10 +16,10 @@
   <widget class="QPushButton" name="downloadPrivButton">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>360</y>
-     <width>83</width>
-     <height>29</height>
+     <x>592</x>
+     <y>200</y>
+     <width>151</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -29,11 +29,17 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>40</y>
-     <width>221</width>
+     <x>150</x>
+     <y>10</y>
+     <width>471</width>
      <height>51</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
+    color: #549bff;
+    font-size: 30px;
+    font-weight: 600;</string>
    </property>
    <property name="text">
     <string>Public and Private Key created!</string>
@@ -42,10 +48,10 @@
   <widget class="QLabel" name="publickey">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>150</y>
-     <width>641</width>
-     <height>61</height>
+     <x>20</x>
+     <y>110</y>
+     <width>611</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
@@ -55,9 +61,9 @@
   <widget class="QLabel" name="privatekey">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>280</y>
-     <width>641</width>
+     <x>20</x>
+     <y>200</y>
+     <width>611</width>
      <height>61</height>
     </rect>
    </property>
@@ -68,10 +74,10 @@
   <widget class="QPushButton" name="downloadPubButton">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>240</y>
-     <width>83</width>
-     <height>29</height>
+     <x>590</x>
+     <y>110</y>
+     <width>151</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -81,14 +87,94 @@
   <widget class="QPushButton" name="contiButton">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>430</y>
-     <width>83</width>
-     <height>29</height>
+     <x>340</x>
+     <y>440</y>
+     <width>121</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
     <string>Continue</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>60</y>
+     <width>761</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Encryption and decryption public and private key pair. you must download the private but we recommend 
+downloading both!</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="signpriv">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>390</y>
+     <width>621</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PRIVATE KEY</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="signpub">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>330</y>
+     <width>611</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PRIVATE KEY</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downloadSignPub">
+   <property name="geometry">
+    <rect>
+     <x>592</x>
+     <y>330</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Download</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downloadSignPriv">
+   <property name="geometry">
+    <rect>
+     <x>592</x>
+     <y>400</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Download</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>270</y>
+     <width>711</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Digital signature public and private key pair. you must download the private but we recommend 
+downloading both!</string>
    </property>
   </widget>
  </widget>

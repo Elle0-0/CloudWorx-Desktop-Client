@@ -63,9 +63,18 @@ void Dashboard::on_shareFileButton_clicked()
         return;
     }
 
-    const FileData &file = model->getFile(index.row());
+    FileData file = model->getFile(index.row());
 
-    emit goToFileShare(file.fileid);
+    QByteArray encryptedFile;
+    QString error;
+    if (!FilesApi::downloadEncryptedFileToMemory(jwtToken, file.fileName, encryptedFile, error)) {
+        QMessageBox::critical(this, "Download Failed", error);
+        return;
+    }
+
+    file.encryptedFile = encryptedFile;
+
+    emit goToFileShare(file, jwtToken);
 }
 
 void Dashboard::setIdAndToken(QString userId, QString jwtToken)

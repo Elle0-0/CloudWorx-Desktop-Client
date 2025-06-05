@@ -13,7 +13,7 @@ class KeyGenPage : public QWidget
 
 public:
     explicit KeyGenPage(QWidget *parent = nullptr);
-    void setPubAndPriv(QString publicKey, QString privateKey);
+    void setPubAndPriv(QString pub, QString priv, QString signPub, QString signPriv);
     ~KeyGenPage();
 
 private slots:
@@ -23,10 +23,16 @@ private slots:
 
     void on_downloadPrivButton_clicked();
 
+    void on_downloadSignPub_clicked();
+
+    void on_downloadSignPriv_clicked();
+
 private:
     Ui::KeyGenPage *ui;
     QString publicKey;
     QString privateKey;
+    QString signPublicKey;
+    QString signPrivateKey;
 
 signals:
     void goToLogin();

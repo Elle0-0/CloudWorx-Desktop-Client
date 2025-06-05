@@ -14,6 +14,7 @@ LoginPage::LoginPage(QWidget *parent)
     ui->setupUi(this);
 }
 
+
 LoginPage::~LoginPage()
 {
     delete ui;
@@ -36,12 +37,22 @@ void LoginPage::on_loginButton_clicked()
     QString username = ui->usernameTextField->text();
     QString password = ui->passwordTextField->text();
 
+    // Input validation
+    if (username.trimmed().isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, "Login Error", "Username and password cannot be empty.");
+        return;
+    }
+
     UserLoginModel loginResponse;
     QString error;
     bool success = AuthAPI::loginUser(username, password, loginResponse, error);
 
+
+    sodium_memzero(password.data(), password.size());
+
     if (!success) {
         qWarning() << "Login failed:" << error;
+        QMessageBox::critical(this, "Login failed:", error);
         return;
     } else {
         qDebug() << "Login successful. usernID: " << loginResponse.user_id;
@@ -49,7 +60,5 @@ void LoginPage::on_loginButton_clicked()
         emit goToDashboard(loginResponse.user_id, loginResponse.token);
     }
 
-
-    sodium_memzero(password.data(), password.size());
 }
 

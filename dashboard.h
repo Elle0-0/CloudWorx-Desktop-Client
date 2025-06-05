@@ -27,8 +27,8 @@ private:
 
 signals:
     void goToFileDecryption(const FileData &file, QString jwtToken);
-    void goToFileShare(const QString file_id);
-    void goToFileUpload(const QString userId,const QString jwtToken);
+    void goToFileShare(const FileData &file, QString jwtToken);
+    void goToFileUpload(const QString userId, const QString jwtToken);
 
 private slots:
     void on_decryptFileButton_clicked();

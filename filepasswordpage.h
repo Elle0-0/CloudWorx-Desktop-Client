@@ -26,7 +26,7 @@ private:
     QString password;
 
 signals:
-    void goToKeyGen(QString publicKey, QString privateKey);
+    void goToKeyGen(QString publicKey, QString privateKey, QString signPublicKey, QString signPrivateKey);
 };
 
 #endif // FILEPASSWORDPAGE_H

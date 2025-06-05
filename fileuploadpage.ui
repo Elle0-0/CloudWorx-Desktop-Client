@@ -35,11 +35,17 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>40</y>
-     <width>131</width>
-     <height>20</height>
+     <x>260</x>
+     <y>20</y>
+     <width>261</width>
+     <height>71</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
+    color: #549bff;
+    font-size: 50px;
+    font-weight: 600;</string>
    </property>
    <property name="text">
     <string>Upload file</string>
@@ -48,8 +54,8 @@
   <widget class="QPushButton" name="uploadFileButton">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>70</y>
+     <x>280</x>
+     <y>100</y>
      <width>211</width>
      <height>71</height>
     </rect>
@@ -86,10 +92,10 @@ QPushButton:disabled {
   <widget class="QLabel" name="uploadedFileLabel">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>170</y>
-     <width>511</width>
-     <height>20</height>
+     <width>431</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="text">
@@ -137,10 +143,10 @@ QPushButton:disabled {
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>230</y>
-     <width>201</width>
-     <height>20</height>
+     <x>140</x>
+     <y>270</y>
+     <width>461</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -150,10 +156,10 @@ QPushButton:disabled {
   <widget class="QLineEdit" name="encryptionPasswordTextField">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>270</y>
+     <x>140</x>
+     <y>310</y>
      <width>471</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="echoMode">

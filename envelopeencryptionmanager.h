@@ -56,7 +56,7 @@ public:
 
     // User setup - creates KEK and sends to server
     static bool setupUserEncryption(const QString& username, const QString& email, const QString& authPassword,
-                                    const QByteArray& filePassword, const QString publicKey, const QString privateKey);
+                                    const QByteArray& filePassword, const QString publicKey, const QString signingPublicKey);
 
     // Password verification - fetches KEK from server and tries to unwrap
     static bool verifyUserFilePassword(const QString& token, const QByteArray& password);

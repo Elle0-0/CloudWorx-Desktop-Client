@@ -52,17 +52,25 @@ void FilePasswordPage::on_createPasswordButton_clicked()
 
     QByteArray passwordBytes = password.toUtf8();
 
-    GeneratedKeypair keypair = generateAndExportX25519Keypair();
-    if (!keypair.success) {
-        QMessageBox::warning(this, "KeyGen Error", "Failed to generate keys");
+    GeneratedKeypair xKeypair = generateAndExportX25519Keypair();
+    if (!xKeypair.success) {
+        QMessageBox::warning(this, "KeyGen Error", "Failed to generate X25519 keys");
         return;
     }
 
-    qDebug() << "Public Key (PEM):\n" << keypair.publicKeyPEM;
-    qDebug() << "Private Key (PEM):\n" << keypair.privateKeyPEM;
+    GeneratedKeypair edKeypair = generateAndExportEd25519Keypair();
+    if (!edKeypair.success) {
+        QMessageBox::warning(this, "KeyGen Error", "Failed to generate Ed25519 keys");
+        return;
+    }
+
+    qDebug() << "X25519 Public Key (PEM):\n" << xKeypair.publicKeyPEM;
+    qDebug() << "X25519 Private Key (PEM):\n" << xKeypair.privateKeyPEM;
+    qDebug() << "Ed25519 Public Key (PEM):\n" << edKeypair.publicKeyPEM;
+    qDebug() << "Ed25519 Private Key (PEM):\n" << edKeypair.privateKeyPEM;
 
     bool success = EnvelopeEncryptionManager::setupUserEncryption(username, email, password, passwordBytes,
-                                                                  keypair.publicKeyPEM, keypair.privateKeyPEM);
+                                                                  xKeypair.publicKeyPEM, edKeypair.publicKeyPEM);
 
 
     if (!success) {
@@ -70,7 +78,7 @@ void FilePasswordPage::on_createPasswordButton_clicked()
         return;
     }else {
         qDebug() << "User file password set";
-        emit goToKeyGen(keypair.publicKeyPEM, keypair.privateKeyPEM);
+        emit goToKeyGen(xKeypair.publicKeyPEM, xKeypair.privateKeyPEM, edKeypair.publicKeyPEM, edKeypair.privateKeyPEM);
     }
 
     // Clear sensitive data from memory
