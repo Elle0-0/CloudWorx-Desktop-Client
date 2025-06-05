@@ -57,17 +57,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET CloudWorx APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(CloudWorx SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(CloudWorx
             ${PROJECT_SOURCES}
@@ -105,12 +99,6 @@ link_directories(${LIBSODIUM_DIR}/lib)
 
 target_link_libraries(CloudWorx PRIVATE ${LIBSODIUM_DIR}/lib/libsodium.a)
 
-# set(LIBCURL_DIR "${CMAKE_SOURCE_DIR}/libs/curl")
-
-# include_directories(${LIBCURL_DIR}/include)
-# link_directories(${LIBCURL_DIR}/lib)
-
-# target_link_libraries(CloudWorx PRIVATE ${LIBCURL_DIR}/lib/libcurl.a)
 
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
@@ -123,7 +111,6 @@ set(OPENSSL_LIBRARIES
 message(STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
 message(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 
-# Manually set include and libs
 target_include_directories(CloudWorx PRIVATE "${OPENSSL_INCLUDE_DIR}")
 
 target_link_libraries(CloudWorx PRIVATE
@@ -139,29 +126,6 @@ target_link_libraries(CloudWorx PRIVATE "${LIBCURL_DIR}/lib/libcurl.dll.a")
 
 
 include_directories("C:/Program Files/OpenSSL-Win64/include")
-
-
-# if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-#     set(OPENSSL_SSL_LIB "${CMAKE_SOURCE_DIR}/libs/libssl.lib")
-#     set(OPENSSL_CRYPTO_LIB "${CMAKE_SOURCE_DIR}/libs/libcrypto.lib")
-# else()
-#     set(OPENSSL_SSL_LIB "${CMAKE_SOURCE_DIR}/libs/libssl.lib")
-#     set(OPENSSL_CRYPTO_LIB "${CMAKE_SOURCE_DIR}/libs/libcrypto.lib")
-# endif()
-
-
-# target_link_libraries(CloudWorx PRIVATE
-#     "${OPENSSL_SSL_LIB}"
-#     "${OPENSSL_CRYPTO_LIB}"
-# )
-
-# set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-# find_package(OpenSSL REQUIRED)
-
-
-# target_include_directories(CloudWorx PRIVATE ${OPENSSL_INCLUDE_DIR})
-# target_link_libraries(CloudWorx PRIVATE ${OPENSSL_LIBRARIES})
-
 
 
 file(COPY ${CMAKE_SOURCE_DIR}/certs/cacert.pem DESTINATION ${CMAKE_BINARY_DIR}/certs)
