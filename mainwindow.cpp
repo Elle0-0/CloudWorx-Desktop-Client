@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Apply a clean, modern stylesheet
+    // stylesheet
     QString mainStyle = R"(
         /* Global App Styles */
         QWidget {

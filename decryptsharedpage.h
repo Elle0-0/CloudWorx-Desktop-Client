@@ -21,6 +21,8 @@ public:
 private slots:
     void on_uploadKeyButton_clicked();
 
+    void on_decryptButton_clicked();
+
 private:
     Ui::DecryptSharedPage *ui;
     QString privSignatureKeyFilePath;

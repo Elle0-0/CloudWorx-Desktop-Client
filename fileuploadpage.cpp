@@ -25,25 +25,6 @@ QString FileUploadPage::getSelectedFilePath() const
 }
 
 
-// void FileUploadPage::on_uploadFileButton_clicked()
-// {
-//     QString filePath = QFileDialog::getOpenFileName(this, "Select File to Encrypt");
-
-//     if (filePath.isEmpty()){
-//         QMessageBox::warning(this, "error", "File path cannot be empty");
-//         return;
-//     }
-
-//     selectedFilePath = filePath;
-
-//     QFileInfo fileInfo(filePath);
-//     ui->uploadedFileLabel->setTextInteractionFlags(Qt::TextBrowserInteraction); // so its clickable
-//     ui->uploadedFileLabel->setOpenExternalLinks(true);
-//     ui->uploadedFileLabel->setText(QString("<a href=\"file:///%1\">%2</a>").arg(filePath, fileInfo.fileName()));
-
-// }
-
-
 void FileUploadPage::on_uploadFileButton_clicked()
 {
     QString filePath = QFileDialog::getOpenFileName(this, "Select File to Encrypt");
