@@ -10,34 +10,34 @@
 
 AuthAPI::AuthAPI() {}
 
-
 bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut, QString& errorOut)
 {
-    CURL *curl = curl_easy_init();
+    CURL* curl = curl_easy_init();
     if (!curl)
         return false;
 
-    // Build JSON from the model
-    QJsonObject json;
-    json["username"] = model.username;
-    json["auth_password"] = model.auth_password;
-    json["email"] = model.email;
-    json["public_key"] = model.public_key;
-    json["signing_public_key"] = model.signing_public_key;
-    json["iv_KEK"] = model.iv_KEK;
-    json["encrypted_KEK"] = model.encrypted_KEK;
-    json["salt"] = model.salt;
-    json["p"] = model.p;
-    json["m"] = model.m;
-    json["t"] = model.t;
-
+    // Build JSON payload
+    QJsonObject json{
+        {"username", model.username},
+        {"auth_password", model.auth_password},
+        {"email", model.email},
+        {"public_key", model.public_key},
+        {"signing_public_key", model.signing_public_key},
+        {"iv_KEK", model.iv_KEK},
+        {"encrypted_KEK", model.encrypted_KEK},
+        {"salt", model.salt},
+        {"p", model.p},
+        {"m", model.m},
+        {"t", model.t}
+    };
 
     QByteArray jsonData = QJsonDocument(json).toJson();
 
-    struct curl_slist *headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
+    struct curl_slist* headers = curl_slist_append(nullptr, "Content-Type: application/json");
 
     std::string responseString;
+    bool success = false;
+
     curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/register");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
@@ -47,45 +47,39 @@ bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut,
 
     if (!setCurlCACert(curl)) {
         errorOut = "Failed to set CA cert.";
-        curl_slist_free_all(headers);
-        curl_easy_cleanup(curl);
-        return false;
-    }
-
-    CURLcode res = curl_easy_perform(curl);
-    bool success = false;
-
-    if (res == CURLE_OK) {
-        responseOut = QString::fromStdString(responseString);
-        success = true;
     } else {
-        qWarning() << "curl error:" << curl_easy_strerror(res);
+        CURLcode res = curl_easy_perform(curl);
+        if (res == CURLE_OK) {
+            responseOut = QString::fromStdString(responseString);
+            success = true;
+        } else {
+            errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+        }
     }
 
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     return success;
 }
-
-
 bool AuthAPI::loginUser(const QString& username, const QString& entered_auth_password,
                         UserLoginModel& responseOut, QString& errorOut)
 {
-    CURL *curl = curl_easy_init();
+    CURL* curl = curl_easy_init();
     if (!curl)
         return false;
 
-    // Build JSON payload
-    QJsonObject json;
-    json["username"] = username;
-    json["entered_auth_password"] = entered_auth_password;
+    QJsonObject json{
+        {"username", username},
+        {"entered_auth_password", entered_auth_password}
+    };
 
     QByteArray jsonData = QJsonDocument(json).toJson();
 
-    struct curl_slist *headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
+    struct curl_slist* headers = curl_slist_append(nullptr, "Content-Type: application/json");
 
     std::string responseString;
+    bool success = false;
+
     curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/auth/login");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.constData());
@@ -93,56 +87,45 @@ bool AuthAPI::loginUser(const QString& username, const QString& entered_auth_pas
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
 
-    // QString certPath = QCoreApplication::applicationDirPath() + "/certs/cacert.pem";
-    // if (!QFile::exists(certPath)) {
-    //     qWarning() << "CA cert file not found at:" << certPath;
-    // }
-
-    // curl_easy_setopt(curl, CURLOPT_CAINFO, certPath.toStdString().c_str());
-
     if (!setCurlCACert(curl)) {
         errorOut = "Failed to set CA cert.";
-        curl_slist_free_all(headers);
-        curl_easy_cleanup(curl);
-        return false;
-    }
-
-
-
-    CURLcode res = curl_easy_perform(curl);
-    bool success = false;
-
-    if (res == CURLE_OK) {
-        QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseString));
-        if (!doc.isObject()) {
-            errorOut = "Invalid JSON response";
-        } else {
-            QJsonObject obj = doc.object();
-            responseOut.token = obj["token"].toString();
-            responseOut.user_id = obj["user_id"].toString();
-
-            QJsonArray filesArray = obj["files"].toArray();
-            for (const QJsonValue& fileVal : filesArray) {
-                QJsonObject fileObj = fileVal.toObject();
-                FileModel file(
-                    fileObj["file_id"].toString(),
-                    fileObj["file_name"].toString(),
-                    fileObj["file_type"].toString(),
-                    fileObj["file_size"].toInt()
-                    );
-                responseOut.files.append(file);
-            }
-
-            success = true;
-        }
     } else {
-        errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+        CURLcode res = curl_easy_perform(curl);
+        long http_code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+        if (res == CURLE_OK && http_code == 200) {
+            QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseString));
+            if (!doc.isObject()) {
+                errorOut = "Invalid JSON response";
+            } else {
+                QJsonObject obj = doc.object();
+                responseOut.token = obj["token"].toString();
+                responseOut.user_id = obj["user_id"].toString();
+
+                QJsonArray filesArray = obj["files"].toArray();
+                for (const QJsonValue& fileVal : filesArray) {
+                    QJsonObject fileObj = fileVal.toObject();
+                    FileModel file(
+                        fileObj["file_id"].toString(),
+                        fileObj["file_name"].toString(),
+                        fileObj["file_type"].toString(),
+                        fileObj["file_size"].toInt()
+                        );
+                    responseOut.files.append(file);
+                }
+
+                success = true;
+            }
+        } else {
+            errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+        }
     }
 
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     return success;
 }
+
 
 bool AuthAPI::changeAuthPassword(const QString username, const QString oldPassword, const QString newPassword , QString& responseOut, QString& errorOut)
 {

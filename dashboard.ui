@@ -74,44 +74,14 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_3">
-    <attribute name="title">
-     <string>Page</string>
-    </attribute>
-    <widget class="QListView" name="listView_3">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>781</width>
-       <height>200</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_4">
-    <attribute name="title">
-     <string>Page</string>
-    </attribute>
-    <widget class="QListView" name="listView_4">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>781</width>
-       <height>200</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
   </widget>
   <widget class="QPushButton" name="uploadFileButton">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>430</y>
-     <width>171</width>
-     <height>61</height>
+     <x>640</x>
+     <y>440</y>
+     <width>141</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -123,7 +93,7 @@
     font-weight: 600;
     border: none;
     border-radius: 10px;
-    padding: 8px 16px;
+  padding: 6px 14px;
 }
 
 QPushButton:hover {
@@ -184,10 +154,10 @@ QPushButton:disabled {
   <widget class="QPushButton" name="decryptFileButton">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>430</y>
-     <width>211</width>
-     <height>61</height>
+     <x>440</x>
+     <y>440</y>
+     <width>191</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -199,7 +169,7 @@ QPushButton:disabled {
     font-weight: 600;
     border: none;
     border-radius: 10px;
-    padding: 8px 16px;
+  padding: 6px 14px;
 }
 
 QPushButton:hover {
@@ -222,10 +192,10 @@ QPushButton:disabled {
   <widget class="QPushButton" name="shareFileButton">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>430</y>
-     <width>211</width>
-     <height>61</height>
+     <x>250</x>
+     <y>440</y>
+     <width>181</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -237,7 +207,7 @@ QPushButton:disabled {
     font-weight: 600;
     border: none;
     border-radius: 10px;
-    padding: 8px 16px;
+    padding: 6px 14px;
 }
 
 QPushButton:hover {
@@ -255,6 +225,121 @@ QPushButton:disabled {
    </property>
    <property name="text">
     <string>share selected file</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="settingsButton">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>20</y>
+     <width>51</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: transparent;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="Images.qrc">
+     <normaloff>:/settings.png</normaloff>:/settings.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>40</width>
+     <height>40</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="refreshButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>380</y>
+     <width>51</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: transparent;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="Images.qrc">
+     <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>40</width>
+     <height>40</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>60</y>
+     <width>311</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
+    color: #549bff;
+    font-size: 50px;
+    font-weight: 600;</string>
+   </property>
+   <property name="text">
+    <string>DASHBOARD</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="deleteFileButton">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>440</y>
+     <width>181</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background-color: #4A90E2;
+    color: white;
+    font-family: &quot;Inter&quot;, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+  padding: 6px 14px;
+}
+
+QPushButton:hover {
+    background-color: #5AA9F4;
+}
+
+QPushButton:pressed {
+    background-color: #3A78C2;
+}
+
+QPushButton:disabled {
+    background-color: #A0C4FF;
+    color: #E0E0E0;
+}</string>
+   </property>
+   <property name="text">
+    <string>delete selected file</string>
    </property>
   </widget>
  </widget>

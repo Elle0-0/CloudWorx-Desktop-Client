@@ -11,6 +11,12 @@ QString encodeBase64(const QByteArray& data) {
     return QString::fromLatin1(data.toBase64());
 }
 
+QByteArray decodeBase64(const QString& data)
+{
+    return QByteArray::fromBase64(data.toUtf8());
+}
+
+
 bool initializeSodium() {
     if (sodium_init() < 0) {
         qWarning() << "Failed to initialize libsodium";
@@ -230,4 +236,18 @@ GeneratedKeypair generateAndExportEd25519Keypair() {
 
     return result;
 }
+
+QString encodePemStringToBase64(const QString& pemString) {
+    return QString::fromUtf8(pemString.toUtf8().toBase64());
+}
+
+
+std::string generateKey(int length) {
+    return std::string(length, '0');
+}
+
+std::string generateKey() {
+    return generateKey(16);
+}
+
 

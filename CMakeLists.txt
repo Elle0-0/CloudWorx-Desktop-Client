@@ -45,6 +45,16 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         keygenpage.h keygenpage.cpp keygenpage.ui
         cryptography/hybridencryptionmanager.h cryptography/hybridencryptionmanager.cpp
         network/sharesapi.h network/sharesapi.cpp
+        accountsettingspage.h accountsettingspage.cpp accountsettingspage.ui
+        decryptsharedpage.h decryptsharedpage.cpp decryptsharedpage.ui
+        VirtualFile.h
+        polymorphism/Message.h
+        polymorphism/TextMessage.h
+        polymorphism/ImageMessage.h
+        polymorphism/Messenger.h
+        polymorphism/polyMain.cpp
+
+
 
     )
 # Define target properties for Android with Qt 6 as:

@@ -4,6 +4,7 @@
 #include "envelopeencryptionmanager.h"
 #include "network/filesapi.h"
 #include "network/sharesapi.h"
+#include "utils/keygenutils.h"
 #include "cryptography/hybridencryptionmanager.h"
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -53,6 +54,7 @@ void ShareFilePage::on_shareButton_clicked()
 
     // 4. Build FileData object for decryption
     FileData fileData;
+    fileData.fileid = file.fileid;
     fileData.ivDEK = file.ivDEK;
     fileData.ivFile = file.ivFile;
     fileData.encryptedDEK = file.encryptedDEK;
@@ -89,7 +91,7 @@ void ShareFilePage::on_shareButton_clicked()
             return;
         }
 
-        // 9. Parse recipient public keys from JSON
+        //9. Parse recipient public keys from JSON
         QJsonParseError parseError;
         QJsonDocument jsonDoc = QJsonDocument::fromJson(response.toUtf8(), &parseError);
         if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
@@ -98,8 +100,8 @@ void ShareFilePage::on_shareButton_clicked()
         }
 
         QJsonObject jsonObj = jsonDoc.object();
-        QByteArray recipientX25519PubKey = decodeStoredPemBase64(jsonObj.value("x25519PublicKey").toString());
-        QByteArray recipientEd25519PubKey = decodeStoredPemBase64(jsonObj.value("ed25519PublicKey").toString());
+        QByteArray recipientX25519PubKey = decodePemBase64FromString(jsonObj.value("x25519_public_key").toString());
+        QByteArray recipientEd25519PubKey = decodePemBase64FromString(jsonObj.value("ed25519_public_key").toString());
 
 
         if (recipientX25519PubKey.isEmpty() || recipientEd25519PubKey.isEmpty()) {
@@ -125,17 +127,33 @@ void ShareFilePage::on_shareButton_clicked()
         EncryptedPayload payload = optionalPayload.value(); // Now safe
 
 
+
+        qDebug() << "Encryption and signing successful.";
+        qDebug() << "Ciphertext size:" << payload.ciphertext.size();
+        qDebug() << "Nonce:" << payload.nonce.toBase64();
+        qDebug() << "Ephemeral Public Key:" << payload.ephemeralPublicKey.toBase64();
+        qDebug() << "Sender Signing Public Key:" << payload.senderSigningPublicKey.toBase64();
+
+        const unsigned char* keyPtr = reinterpret_cast<const unsigned char*>(payload.ephemeralPublicKey.constData());
+        QString base64PemX25519 = encodeBase64(publicKeyToPem(keyPtr, payload.ephemeralPublicKey.size()).toUtf8());
+
+        // const unsigned char* skeyPtr = reinterpret_cast<const unsigned char*>(payload.senderSigningPublicKey.constData());
+        // QString base64PemEd25519 = encodeBase64(ed25519PublicKeyToPem(skeyPtr, payload.senderSigningPublicKey.size()).toUtf8());
+
+
         // 11. Share the encrypted file
+        qDebug() << "Starting to share the encrypted file...";
         if (!SharesApi::shareEncryptedFile(
                 fileData.fileid,
                 authToken,
                 username,
-                payload.ciphertext,
-                payload.nonce,
-                payload.ephemeralPublicKey,
-                payload.senderSigningPublicKey,
+                payload.ciphertext.toBase64(),
+                payload.nonce.toBase64(),
+                payload.ephemeralPublicKey.toBase64(),
+                payload.signature.toBase64(),
                 response,
                 error)) {
+            qWarning() << "Failed to share encrypted file:" << error;
             QMessageBox::critical(this, "Share Failed", "Failed to share file: " + error);
             return;
         }
@@ -232,8 +250,20 @@ QByteArray ShareFilePage::decodeStoredPemBase64(const QString& filePath) {
     // Decode the base64-encoded payload
     return QByteArray::fromBase64(base64Body.toUtf8());
 }
+QByteArray ShareFilePage::decodePemBase64FromString(const QString& pemStrRaw) {
+    QString pemStr = pemStrRaw.trimmed();
 
+    // Extract base64 payload (skip header/footer lines)
+    QStringList lines = pemStr.split('\n', Qt::SkipEmptyParts);
+    QString base64Body;
+    for (const QString& line : lines) {
+        if (line.startsWith("-----")) continue;  // skip PEM headers
+        base64Body += line.trimmed();
+    }
 
+    // Decode the base64-encoded payload
+    return QByteArray::fromBase64(base64Body.toUtf8());
+}
 
 
 void ShareFilePage::on_privKeyButton_2_clicked()

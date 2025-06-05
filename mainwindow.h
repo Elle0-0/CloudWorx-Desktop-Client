@@ -8,6 +8,7 @@
 #include "decryptfilepage.h"
 #include "sharefilepage.h"
 #include "keygenpage.h"
+#include "decryptsharedpage.h"
 
 #include <QMainWindow>
 
@@ -45,6 +46,8 @@ private slots:
 
     void goToKenGen();
 
+    void goToDecryptSharedFile();
+
 
 private:
     Ui::MainWindow *ui;
@@ -56,5 +59,9 @@ private:
     DecryptFilePage *decryptFilePage;
     ShareFilePage *shareFilepage;
     KeyGenPage *keyGenPage;
+    DecryptSharedPage *decryptSharedFile;
+
+protected:
+    QString currentUserId;
 };
 #endif // MAINWINDOW_H

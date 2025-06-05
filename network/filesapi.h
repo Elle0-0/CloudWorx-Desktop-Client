@@ -37,7 +37,7 @@ public:
                              const QString& customFileName = "");
     static bool getAllFiles(QString& responseOut, const QString& fieldsMask);
     static bool resolveFileId(const QString& fileName, QString& fileIdOut);
-    static bool deleteFileByName(const QString& fileName, QString& responseOut);
+    static bool deleteFileByName(const QString& fileName, const QString& authToken, QString& responseOut);
     static bool downloadEncryptedFileToMemory(const QString& authToken, const QString& fileName, QByteArray& fileDataOut, QString& errorOut);
 };
 

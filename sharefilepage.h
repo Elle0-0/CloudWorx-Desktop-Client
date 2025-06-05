@@ -19,6 +19,7 @@ public:
     QString getPrivateSignatureKeyFilePath() const;
     QString getPublicSignatureKeyFilePath() const;
     QByteArray decodeStoredPemBase64(const QString& storedBase64Pem);
+    QByteArray decodePemBase64FromString(const QString& pemStrRaw);
     ~ShareFilePage();
 
 private slots:

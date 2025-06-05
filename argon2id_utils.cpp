@@ -131,3 +131,31 @@ bool hasRepetitivePattern(const QString& password) {
     return false;
 }
 
+// // Helper function for pattern detection
+// template<typename Container>
+// bool hasRepetitivePattern(const Container& password) {
+//     auto size = password.size();
+//     if (size < 3) return false;
+
+//     // Check for 3+ repeated characters
+//     for (size_t i = 0; i < size - 2; ++i) {
+//         if (password[i] == password[i + 1] && password[i] == password[i + 2]) {
+//             return true;
+//         }
+//     }
+
+//     // Check for simple sequences
+//     for (size_t i = 0; i < size - 2; ++i) {
+//         auto c1 = password[i];
+//         auto c2 = password[i + 1];
+//         auto c3 = password[i + 2];
+
+//         if ((c1 + 1 == c2) && (c2 + 1 == c3)) {
+//             return true;
+//         }
+//     }
+
+//     return false;
+// }
+
+

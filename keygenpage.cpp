@@ -39,7 +39,7 @@ void KeyGenPage::setPubAndPriv(QString pub, QString priv, QString signPub, QStri
 void KeyGenPage::on_downloadPubButton_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save Public Key"), "public_key.pem", tr("PEM Files (*.pem);;All Files (*)"));
+                                                    tr("Save Public Key"), "public_key.txt", tr("All Files (*)"));
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -58,7 +58,7 @@ void KeyGenPage::on_downloadPubButton_clicked()
 void KeyGenPage::on_downloadPrivButton_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save Private Key"), "private_key.pem", tr("PEM Files (*.pem);;All Files (*)"));
+                                                    tr("Save Private Key"), "private_key.txt", tr("All Files (*)"));
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -76,7 +76,7 @@ void KeyGenPage::on_downloadPrivButton_clicked()
 void KeyGenPage::on_downloadSignPub_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save Public Signature Key"), "signature_public_key.pem", tr("PEM Files (*.pem);;All Files (*)"));
+                                                    tr("Save Public Signature Key"), "signature_public_key.txt", tr("All Files (*)"));
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -94,7 +94,7 @@ void KeyGenPage::on_downloadSignPub_clicked()
 void KeyGenPage::on_downloadSignPriv_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save Private Signature Key"), "signature_private_key.pem", tr("PEM Files (*.pem);;All Files (*)"));
+                                                    tr("Save Private Signature Key"), "signature_private_key.txt", tr("All Files (*)"));
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);

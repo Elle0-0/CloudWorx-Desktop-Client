@@ -64,7 +64,7 @@ void FilePasswordPage::on_createPasswordButton_clicked()
         return;
     }
 
-    qDebug() << "X25519 Public Key (PEM):\n" << xKeypair.publicKeyPEM;
+    qDebug() << "X25519 Public Key (PEM):\n" << encodeBase64(xKeypair.publicKeyPEM.toUtf8());
     qDebug() << "X25519 Private Key (PEM):\n" << xKeypair.privateKeyPEM;
     qDebug() << "Ed25519 Public Key (PEM):\n" << edKeypair.publicKeyPEM;
     qDebug() << "Ed25519 Private Key (PEM):\n" << edKeypair.privateKeyPEM;
@@ -78,7 +78,8 @@ void FilePasswordPage::on_createPasswordButton_clicked()
         return;
     }else {
         qDebug() << "User file password set";
-        emit goToKeyGen(xKeypair.publicKeyPEM, xKeypair.privateKeyPEM, edKeypair.publicKeyPEM, edKeypair.privateKeyPEM);
+        emit goToKeyGen(encodeBase64(xKeypair.publicKeyPEM.toUtf8()), encodeBase64(xKeypair.privateKeyPEM.toUtf8()),
+                        encodeBase64(edKeypair.publicKeyPEM.toUtf8()), encodeBase64(edKeypair.privateKeyPEM.toUtf8()));
     }
 
     // Clear sensitive data from memory

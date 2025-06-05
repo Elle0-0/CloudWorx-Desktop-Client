@@ -192,6 +192,9 @@ QPushButton:disabled {
      <height>29</height>
     </rect>
    </property>
+   <property name="cursor">
+    <cursorShape>BusyCursor</cursorShape>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
     background: transparent;

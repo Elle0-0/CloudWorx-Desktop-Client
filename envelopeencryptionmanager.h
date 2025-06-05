@@ -43,6 +43,16 @@ struct FileData {
     QByteArray encryptedFile; // Will be Base64 encoded for JSON
     QString assocDataFile;  // Additional metadata
 
+    QString shareid;
+    QString sharedBy; // Sender user ID
+    QString sharedByUsername;
+    QString nonce; // Base64-encoded AES-GCM nonce
+    QString ephemeralPublicKey; // Base64-encoded ephemeral X25519 public key
+    QString senderSignature; // Base64-encoded Ed25519 signature
+    QString senderX25519PublicKeyPem;
+    QString senderEd25519PublicKeyPem;
+    QString createdAt;
+
     // JSON conversion
     QJsonObject toJson() const;
     static FileData fromJson(const QJsonObject& json);

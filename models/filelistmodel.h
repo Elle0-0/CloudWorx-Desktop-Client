@@ -34,6 +34,16 @@ public:
         endInsertRows();
     }
 
+    void removeFile(int row) {
+        if (row < 0 || row >= files.size())
+            return;
+
+        beginRemoveRows(QModelIndex(), row, row);
+        files.removeAt(row);
+        endRemoveRows();
+    }
+
+
     void clear()
     {
         beginResetModel();

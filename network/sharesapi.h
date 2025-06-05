@@ -24,6 +24,21 @@ struct ShareDetailModel {
     int file_size;
     QString file_type;
 };
+struct SharedFileData {
+    QString fileId;
+    QString fileName;
+    QString fileType;
+    qint64 fileSize;
+    QString sharedBy;
+    QString sharedByUsername;
+    QByteArray encryptedFile;           // Base64-decoded
+    QByteArray nonce;                   // Base64-decoded
+    QByteArray ephemeralPublicKey;      // Base64-decoded
+    QByteArray senderSignature;         // Base64-decoded
+    QString senderX25519PublicKeyPem;
+    QString senderEd25519PublicKeyPem;
+    QString createdAt;
+};
 
 
 
@@ -41,7 +56,10 @@ public:
                                     QString& responseOut,
                                     QString& errorOut);
 
-    static bool downloadSharedFile(const QString& shareId,const QString& authToken, QString& responseOut, QString& errorOut);
+    static bool downloadSharedFile(const QString& shareId,
+                                   const QString& authToken,
+                                   SharedFileData& fileOut,
+                                   QString& errorOut);
     static bool getPublicKeysForUser(const QString& username,const QString& authToken, QString& responseOut, QString& errorOut);
     static bool getFilesSharedWithMe(QList<SharedFileModel>& filesOut,const QString& authToken, QString& errorOut);
     static bool getSharesForFile(const QString& file_id,const QString& authToken, QList<ShareDetailModel>& sharesOut, QString& errorOut);

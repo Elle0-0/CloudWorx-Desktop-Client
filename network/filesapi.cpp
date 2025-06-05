@@ -40,13 +40,13 @@ bool FilesApi::getFiles(const QString& authToken, QList<FileInfo>& filesOut, int
     }
 
     CURLcode res = curl_easy_perform(curl);
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
     bool success = false;
 
-    if (res == CURLE_OK) {
+    if (res == CURLE_OK && http_code == 200) {
         QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseString));
-        if (!doc.isObject()) {
-            errorOut = "Invalid JSON response";
-        } else {
+        if (doc.isObject()) {
             QJsonObject root = doc.object();
             countOut = root["count"].toInt();
 
@@ -68,17 +68,21 @@ bool FilesApi::getFiles(const QString& authToken, QList<FileInfo>& filesOut, int
 
                 filesOut.append(file);
             }
-
             success = true;
+        } else {
+            errorOut = "Invalid JSON response";
         }
     } else {
-        errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+        errorOut = QString("CURL error: %1, HTTP code: %2")
+                       .arg(curl_easy_strerror(res))
+                       .arg(http_code);
     }
 
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     return success;
 }
+
 
 bool FilesApi::uploadEncryptedFile(const QString& authToken,
                                    const QString& filePath,
@@ -90,7 +94,7 @@ bool FilesApi::uploadEncryptedFile(const QString& authToken,
                                    QString& responseOut,
                                    const QString& customFileName)
 {
-    CURL *curl = curl_easy_init();
+    CURL* curl = curl_easy_init();
     if (!curl)
         return false;
 
@@ -100,21 +104,16 @@ bool FilesApi::uploadEncryptedFile(const QString& authToken,
         return false;
     }
 
-    // Use MIME instead of deprecated formadd
     curl_mime* mime = curl_mime_init(curl);
     curl_mimepart* part = curl_mime_addpart(mime);
-
-    // File part
     curl_mime_name(part, "encrypted_file");
     curl_mime_filedata(part, filePath.toStdString().c_str());
 
-    // Prepare headers
     struct curl_slist* headers = nullptr;
     QFileInfo fileInfo(filePath);
     QString finalFileName = customFileName.isEmpty() ? fileInfo.fileName() : customFileName;
 
     headers = curl_slist_append(headers, QString("Authorization: Bearer " + authToken).toStdString().c_str());
-
     headers = curl_slist_append(headers, ("X-File-Name: " + finalFileName).toUtf8().constData());
     headers = curl_slist_append(headers, ("X-IV-File: " + ivFile).toUtf8().constData());
     if (!fileType.isEmpty())
@@ -124,39 +123,45 @@ bool FilesApi::uploadEncryptedFile(const QString& authToken,
     headers = curl_slist_append(headers, ("X-Encrypted-DEK: " + encryptedDEK).toUtf8().constData());
 
     std::string responseString;
-
     curl_easy_setopt(curl, CURLOPT_URL, "https://networkninjas.gobbler.info/api/files");
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);  // modern replacement
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseString);
 
     if (!setCurlCACert(curl)) {
         qDebug() << "Failed to set CA cert.";
+        curl_mime_free(mime);
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
         return false;
     }
 
     CURLcode res = curl_easy_perform(curl);
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
     bool success = false;
 
-    if (res == CURLE_OK) {
+    if (res == CURLE_OK && http_code == 200) {
         responseOut = QString::fromStdString(responseString);
         success = true;
         qDebug() << "[uploadEncryptedFile] Upload succeeded.";
         qDebug() << "[uploadEncryptedFile] Server response:" << responseOut;
     } else {
-        qWarning() << "CURL error:" << curl_easy_strerror(res);
+        responseOut = QString("CURL error: %1, HTTP code: %2")
+                          .arg(curl_easy_strerror(res))
+                          .arg(http_code);
+        qWarning() << responseOut;
     }
 
-    curl_mime_free(mime);                 // Clean up MIME
-    curl_slist_free_all(headers);        // Clean up headers
+    curl_mime_free(mime);
+    curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     file.close();
 
     return success;
 }
+
 bool FilesApi::downloadEncryptedFileToMemory(const QString& authToken, const QString& fileName, QByteArray& fileDataOut, QString& errorOut)
 {
     CURL* curl = curl_easy_init();
@@ -172,8 +177,6 @@ bool FilesApi::downloadEncryptedFileToMemory(const QString& authToken, const QSt
 
     curl_easy_setopt(curl, CURLOPT_URL, url.toStdString().c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-    // Capture into std::string buffer
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, +[](char* ptr, size_t size, size_t nmemb, void* userdata) -> size_t {
             std::string* buffer = static_cast<std::string*>(userdata);
             buffer->append(ptr, size * nmemb);
@@ -189,28 +192,30 @@ bool FilesApi::downloadEncryptedFileToMemory(const QString& authToken, const QSt
     }
 
     CURLcode res = curl_easy_perform(curl);
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
     bool success = false;
 
-    if (res == CURLE_OK) {
+    if (res == CURLE_OK && http_code == 200) {
         fileDataOut = QByteArray::fromStdString(responseBuffer);
         success = true;
     } else {
-        errorOut = QString("CURL error: ") + curl_easy_strerror(res);
+        errorOut = QString("CURL error: %1 | HTTP code: %2").arg(curl_easy_strerror(res)).arg(http_code);
     }
 
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     return success;
 }
-
 bool FilesApi::resolveFileId(const QString& fileName, QString& fileIdOut)
 {
     CURL* curl = curl_easy_init();
     if (!curl)
         return false;
 
-    // Encode the file name for use in URL
-    QString url = QString("https://networkninjas.gobbler.info/api/files/resolve-id/%1").arg(QString::fromUtf8(QUrl::toPercentEncoding(fileName)));
+    QString url = QString("https://networkninjas.gobbler.info/api/files/resolve-id/%1")
+                      .arg(QString::fromUtf8(QUrl::toPercentEncoding(fileName)));
 
     curl_easy_setopt(curl, CURLOPT_URL, url.toUtf8().constData());
 
@@ -225,9 +230,12 @@ bool FilesApi::resolveFileId(const QString& fileName, QString& fileIdOut)
     }
 
     CURLcode res = curl_easy_perform(curl);
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
     bool success = false;
 
-    if (res == CURLE_OK) {
+    if (res == CURLE_OK && http_code == 200) {
         QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(responseStr));
         if (doc.isObject()) {
             QJsonObject obj = doc.object();
@@ -235,27 +243,34 @@ bool FilesApi::resolveFileId(const QString& fileName, QString& fileIdOut)
                 fileIdOut = obj["file_id"].toString();
                 success = true;
             } else {
-                qWarning() << "Response does not contain file_id.";
+                qWarning() << "Response JSON does not contain 'file_id'.";
             }
         } else {
             qWarning() << "Invalid JSON received.";
         }
     } else {
-        qWarning() << "CURL error:" << curl_easy_strerror(res);
+        qWarning() << QString("CURL error: %1 | HTTP code: %2")
+                          .arg(curl_easy_strerror(res))
+                          .arg(http_code);
     }
 
     curl_easy_cleanup(curl);
     return success;
 }
 
-bool FilesApi::deleteFileByName(const QString& fileName, QString& responseOut)
+bool FilesApi::deleteFileByName(const QString& fileName,const QString& authToken, QString& responseOut)
 {
     CURL* curl = curl_easy_init();
     if (!curl)
         return false;
 
-    // Encode the file name for the URL
-    QString url = QString("https://networkninjas.gobbler.info/api/files/%1").arg(QString::fromUtf8(QUrl::toPercentEncoding(fileName)));
+    QString url = QString("https://networkninjas.gobbler.info/api/files/%1")
+                      .arg(QString::fromUtf8(QUrl::toPercentEncoding(fileName)));
+
+    struct curl_slist* headers = nullptr;
+    QString authHeader = "Authorization: Bearer " + authToken;
+    headers = curl_slist_append(headers, authHeader.toStdString().c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     curl_easy_setopt(curl, CURLOPT_URL, url.toUtf8().constData());
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -271,15 +286,19 @@ bool FilesApi::deleteFileByName(const QString& fileName, QString& responseOut)
     }
 
     CURLcode res = curl_easy_perform(curl);
-    bool success = false;
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
-    if (res == CURLE_OK) {
+    bool success = false;
+    if (res == CURLE_OK && http_code == 200) {
         responseOut = QString::fromStdString(responseStr);
         success = true;
     } else {
-        qWarning() << "CURL error:" << curl_easy_strerror(res);
+        qWarning() << "CURL error:" << curl_easy_strerror(res) << "HTTP code:" << http_code;
+        responseOut = QString("HTTP Error %1").arg(http_code);
     }
 
     curl_easy_cleanup(curl);
     return success;
 }
+

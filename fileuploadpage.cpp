@@ -1,6 +1,7 @@
 #include "fileuploadpage.h"
 #include "ui_fileuploadpage.h"
 #include "envelopeencryptionmanager.h"
+#include "VirtualFile.h"
 
 #include <QMessageBox>
 #include <sodium.h>
@@ -24,23 +25,63 @@ QString FileUploadPage::getSelectedFilePath() const
 }
 
 
+// void FileUploadPage::on_uploadFileButton_clicked()
+// {
+//     QString filePath = QFileDialog::getOpenFileName(this, "Select File to Encrypt");
+
+//     if (filePath.isEmpty()){
+//         QMessageBox::warning(this, "error", "File path cannot be empty");
+//         return;
+//     }
+
+//     selectedFilePath = filePath;
+
+//     QFileInfo fileInfo(filePath);
+//     ui->uploadedFileLabel->setTextInteractionFlags(Qt::TextBrowserInteraction); // so its clickable
+//     ui->uploadedFileLabel->setOpenExternalLinks(true);
+//     ui->uploadedFileLabel->setText(QString("<a href=\"file:///%1\">%2</a>").arg(filePath, fileInfo.fileName()));
+
+// }
+
+
 void FileUploadPage::on_uploadFileButton_clicked()
 {
     QString filePath = QFileDialog::getOpenFileName(this, "Select File to Encrypt");
 
-    if (filePath.isEmpty()){
-        QMessageBox::warning(this, "error", "File path cannot be empty");
+    if (filePath.isEmpty()) {
+        QMessageBox::warning(this, "Error", "File path cannot be empty");
         return;
     }
-
     selectedFilePath = filePath;
 
     QFileInfo fileInfo(filePath);
-    ui->uploadedFileLabel->setTextInteractionFlags(Qt::TextBrowserInteraction); // so its clickable
+    QString ext = fileInfo.suffix().toLower();
+
+    std::unique_ptr<VirtualFile> file;
+
+    if (ext == "txt") {
+        file = std::make_unique<TextFile>(filePath);
+    } else if (ext == "pdf") {
+        file = std::make_unique<PdfFile>(filePath);
+    } else if (ext == "png") {
+        file = std::make_unique<ImageFile>(filePath);
+    } else {
+        QMessageBox::warning(this, "Unsupported File", "Only .txt, .pdf, and .png files are supported.");
+        return;
+    }
+
+    // polymorphic call
+    qDebug() << "File Type:" << file->getType();
+    qDebug() << "File Size:" << file->getSize();
+
+    ui->uploadedFileLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     ui->uploadedFileLabel->setOpenExternalLinks(true);
-    ui->uploadedFileLabel->setText(QString("<a href=\"file:///%1\">%2</a>").arg(filePath, fileInfo.fileName()));
+    ui->uploadedFileLabel->setText(QString("<a href=\"file:///%1\">%2</a>")
+                                       .arg(filePath, file->getFileName()));
+
 
 }
+
 
 
 void FileUploadPage::on_encryptFileButton_clicked()
@@ -58,7 +99,6 @@ void FileUploadPage::on_encryptFileButton_clicked()
         return;
     }
 
-    // TODO: FUNCTION HERE TO CHECK IF PASSWORD MATCHES THE ONE SAVED IN THE DB.
 
     try {
         QByteArray passwordBytes = password.toUtf8();

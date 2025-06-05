@@ -17,6 +17,7 @@ public:
     explicit Dashboard(QWidget *parent = nullptr);
     void setIdAndToken(QString userId, QString jwtToken);
     void loadFiles();
+    void loadSharedFiles();
     ~Dashboard();
 
 private:
@@ -29,11 +30,16 @@ signals:
     void goToFileDecryption(const FileData &file, QString jwtToken);
     void goToFileShare(const FileData &file, QString jwtToken);
     void goToFileUpload(const QString userId, const QString jwtToken);
+    void goToDecryptSharedFile(FileData file, QString jwtToken);
+
 
 private slots:
     void on_decryptFileButton_clicked();
     void on_shareFileButton_clicked();
     void on_uploadFileButton_clicked();
+    void on_refreshButton_clicked();
+    void on_deleteFileButton_clicked();
+    void onTabChanged(int index);
 };
 
 #endif // DASHBOARD_H
