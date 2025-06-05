@@ -8,6 +8,7 @@ struct UserRegisterModel {
     QString email;
     QString auth_password;
     QString public_key;
+    QString signing_public_key;
     QString iv_KEK;
     QString encrypted_KEK;
     QString salt;

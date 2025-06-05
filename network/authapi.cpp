@@ -23,6 +23,7 @@ bool AuthAPI::registerUser(const UserRegisterModel& model, QString& responseOut,
     json["auth_password"] = model.auth_password;
     json["email"] = model.email;
     json["public_key"] = model.public_key;
+    json["signing_public_key"] = model.signing_public_key;
     json["iv_KEK"] = model.iv_KEK;
     json["encrypted_KEK"] = model.encrypted_KEK;
     json["salt"] = model.salt;

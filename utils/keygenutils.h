@@ -19,6 +19,8 @@ bool generateEd25519Keypair(QString& outPublicKeyB64, QString& outPrivateKeyB64)
 QString privateKeyToPem(const unsigned char* privateKey, size_t keyLen);
 QString publicKeyToPem(const unsigned char* publicKey, size_t keyLen) ;
 GeneratedKeypair generateAndExportX25519Keypair();
-
+bool generateEd25519Keypair(QString& outPublicKeyB64, QString& outPrivateKeyB64);
+QString ed25519PrivateKeyToPem(const unsigned char* privateKey, size_t keyLen);
+GeneratedKeypair generateAndExportEd25519Keypair();
 
 #endif // KEYGENUTILS_H

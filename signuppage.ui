@@ -55,9 +55,9 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>440</y>
-     <width>83</width>
-     <height>29</height>
+     <y>410</y>
+     <width>101</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -69,14 +69,12 @@
     <rect>
      <x>90</x>
      <y>190</y>
-     <width>91</width>
+     <width>261</width>
      <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
-    color: #fff;
-    font-weight: 600;</string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Username</string>
@@ -88,7 +86,7 @@
      <x>90</x>
      <y>220</y>
      <width>271</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
   </widget>
@@ -134,8 +132,8 @@ QPushButton:disabled {
   <widget class="QPushButton" name="loginButton">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>445</y>
+     <x>450</x>
+     <y>450</y>
      <width>71</width>
      <height>29</height>
     </rect>
@@ -166,14 +164,9 @@ QPushButton:hover {
     <rect>
      <x>410</x>
      <y>190</y>
-     <width>91</width>
+     <width>261</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
-    color: #fff;
-    font-weight: 600;</string>
    </property>
    <property name="text">
     <string>Email</string>
@@ -184,14 +177,9 @@ QPushButton:hover {
     <rect>
      <x>90</x>
      <y>290</y>
-     <width>91</width>
+     <width>271</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
-    color: #fff;
-    font-weight: 600;</string>
    </property>
    <property name="text">
     <string>Password</string>
@@ -202,14 +190,9 @@ QPushButton:hover {
     <rect>
      <x>410</x>
      <y>290</y>
-     <width>161</width>
+     <width>271</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
-    color: #fff;
-    font-weight: 600;</string>
    </property>
    <property name="text">
     <string>Re-enter Password</string>
@@ -221,7 +204,7 @@ QPushButton:hover {
      <x>410</x>
      <y>220</y>
      <width>271</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
   </widget>
@@ -231,7 +214,7 @@ QPushButton:hover {
      <x>410</x>
      <y>320</y>
      <width>271</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="echoMode">
@@ -244,7 +227,7 @@ QPushButton:hover {
      <x>90</x>
      <y>320</y>
      <width>271</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="echoMode">
@@ -254,16 +237,11 @@ QPushButton:hover {
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>450</y>
-     <width>201</width>
+     <x>210</x>
+     <y>460</y>
+     <width>241</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">    font-family: &quot;Inter&quot;, sans-serif;
-    color: #fff;
-    font-weight: 600;</string>
    </property>
    <property name="text">
     <string>Already have an account?</string>

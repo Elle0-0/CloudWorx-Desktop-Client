@@ -32,13 +32,13 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="encryptionPasswordTextField">
+  <widget class="QLineEdit" name="userTextField">
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>110</y>
+     <y>40</y>
      <width>471</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="echoMode">
@@ -49,8 +49,8 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>70</y>
-     <width>261</width>
+     <y>20</y>
+     <width>471</width>
      <height>20</height>
     </rect>
    </property>
@@ -62,19 +62,19 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>140</y>
+     <y>80</y>
      <width>471</width>
-     <height>81</height>
+     <height>61</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="encryptionPasswordTextField_2">
+  <widget class="QLineEdit" name="encryptionPasswordTextField">
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>300</y>
+     <y>180</y>
      <width>471</width>
-     <height>28</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="echoMode">
@@ -85,8 +85,8 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>260</y>
-     <width>211</width>
+     <y>150</y>
+     <width>471</width>
      <height>20</height>
     </rect>
    </property>
@@ -94,13 +94,13 @@
     <string>Enter file password to confirm</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="shareButton">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>360</y>
-     <width>111</width>
-     <height>29</height>
+     <x>630</x>
+     <y>430</y>
+     <width>141</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -112,12 +112,90 @@
     <rect>
      <x>30</x>
      <y>430</y>
-     <width>151</width>
-     <height>41</height>
+     <width>201</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
     <string>Go to Dashboard</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="signPrivButton">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>320</y>
+     <width>371</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Upload your private signature key</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="privKey">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>220</y>
+     <width>471</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="signKey">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>290</y>
+     <width>471</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="signPubKey">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>370</y>
+     <width>471</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="signPubButton_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>400</y>
+     <width>371</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Upload your public signature key</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="privKeyButton_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>250</y>
+     <width>371</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Upload your private key</string>
    </property>
   </widget>
  </widget>

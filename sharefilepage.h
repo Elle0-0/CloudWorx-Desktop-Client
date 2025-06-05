@@ -2,6 +2,7 @@
 #define SHAREFILEPAGE_H
 
 #include <QWidget>
+#include "envelopeencryptionmanager.h"
 
 namespace Ui {
 class ShareFilePage;
@@ -13,15 +14,36 @@ class ShareFilePage : public QWidget
 
 public:
     explicit ShareFilePage(QWidget *parent = nullptr);
-    void setFileId(const QString file_id);
+    void setFileData(const FileData &fileData, QString jwtToken);
+    QString getPrivateKeyFilePath() const;
+    QString getPrivateSignatureKeyFilePath() const;
+    QString getPublicSignatureKeyFilePath() const;
+    QByteArray decodeStoredPemBase64(const QString& storedBase64Pem);
     ~ShareFilePage();
 
 private slots:
     void on_dashboardButton_clicked();
 
+    void on_shareButton_clicked();
+
+    void on_shareButton_2_clicked();
+
+    void on_privKeyButton_clicked();
+
+    void on_signPrivButton_clicked();
+
+    void on_signPubButton_2_clicked();
+
+    void on_privKeyButton_2_clicked();
+
 private:
     Ui::ShareFilePage *ui;
-    QString file_id;
+    FileData file;
+    QString authToken;
+    QString privKeyFilePath;
+    QString privSignatureKeyFilePath;
+    QString pubSignatureKeyFilePath;
+
 
 signals:
     void backToDashboard();
