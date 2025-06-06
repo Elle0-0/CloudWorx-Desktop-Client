@@ -87,4 +87,11 @@ void FilePasswordPage::on_createPasswordButton_clicked()
     sodium_memzero(password.data(), password.size());
 
 }
+void FilePasswordPage::reset()
+{
+    ui->passwordTextField->clear();
+    ui->rePasswordTextField->clear();
+    ui->errorLabel->clear();
+}
+
 

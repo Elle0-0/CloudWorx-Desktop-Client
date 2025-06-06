@@ -53,6 +53,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         polymorphism/ImageMessage.h
         polymorphism/Messenger.h
         polymorphism/polyMain.cpp
+        templates/employeeRecord.h
+        templates/manageRecord.cpp
 
 
 

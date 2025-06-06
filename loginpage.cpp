@@ -61,4 +61,12 @@ void LoginPage::on_loginButton_clicked()
     }
 
 }
+void LoginPage::reset()
+{
+    ui->usernameTextField->clear();
+    ui->passwordTextField->clear();
+
+    ui->usernameTextField->setFocus();
+
+}
 

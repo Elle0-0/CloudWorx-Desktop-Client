@@ -119,3 +119,9 @@ void FileUploadPage::on_dashboardButton_clicked()
     emit backToDashboard();
 }
 
+void FileUploadPage::reset()
+{
+    selectedFilePath.clear();
+    ui->uploadedFileLabel->clear();
+    ui->encryptionPasswordTextField->clear();
+}

@@ -14,6 +14,7 @@ class FilePasswordPage : public QWidget
 public:
     explicit FilePasswordPage(QWidget *parent = nullptr);
     void setUserData(const QString &username, const QString &email, const QString &hashedPassword);
+    void reset();
     ~FilePasswordPage();
 
 private slots:

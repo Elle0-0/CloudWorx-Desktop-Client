@@ -48,6 +48,8 @@ private slots:
 
     void goToDecryptSharedFile();
 
+    void handleLogout();
+
 
 private:
     Ui::MainWindow *ui;

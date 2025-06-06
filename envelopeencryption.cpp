@@ -103,9 +103,6 @@ WrappedKEKResult EnvelopeEncryption::generateAndWrapKEK(const QString username, 
 
 
     // // Step 3: Wrap KEK with PDK
-    // QByteArray kekNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
-    // randombytes_buf(kekNonce.data(), kekNonce.size());
-
     QByteArray wrappedKEK(sizeof kek + crypto_aead_aes256gcm_ABYTES, 0);
     unsigned long long wrappedKEKLen;
 
@@ -131,7 +128,7 @@ WrappedKEKResult EnvelopeEncryption::generateAndWrapKEK(const QString username, 
 
 
 EnvelopeEncryptionResult EnvelopeEncryption::encryptWithKEK(const QString userid, const QString fileName,
-                                                            const QByteArray& plaintext, const QByteArray& kek) {
+                                                            const QByteArray& plaintext, const QByteArray& kek, const QString kekCreated) {
     if (sodium_init() < 0) {
         throw std::runtime_error("libsodium initialization failed.");
     }
@@ -141,8 +138,7 @@ EnvelopeEncryptionResult EnvelopeEncryption::encryptWithKEK(const QString userid
     randombytes_buf(dek, sizeof dek);
 
     // Step 2: Encrypt plaintext with DEK
-    QByteArray msgNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
-    randombytes_buf(msgNonce.data(), msgNonce.size());
+    QByteArray msgNonce = sha256First12Bytes(userid.toUtf8() + kekCreated.toUtf8() + generateRandomBytes(12));
 
     QByteArray ciphertext(plaintext.size() + crypto_aead_aes256gcm_ABYTES, 0);
     unsigned long long ciphertextLen;
@@ -158,8 +154,6 @@ EnvelopeEncryptionResult EnvelopeEncryption::encryptWithKEK(const QString userid
     }
 
     // // Step 3: Wrap DEK with KEK
-    // QByteArray dekNonce(crypto_aead_aes256gcm_NPUBBYTES, 0);
-    // randombytes_buf(dekNonce.data(), dekNonce.size());
 
     QByteArray dekNonce = sha256First12Bytes(userid.toUtf8() + fileName.toUtf8() + generateRandomBytes(12));
 

@@ -170,9 +170,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(signUpPage, &SignUpPage::backToMenu, this, &MainWindow::goToMenu);
     connect(filePasswordPage, &FilePasswordPage::goToKeyGen, this, &MainWindow::goToKenGen);
     connect(decryptFilePage, &DecryptFilePage::backToDashboard, this, &MainWindow::goToDashboard);
+    connect(decryptSharedFile, &DecryptSharedPage::backToDashboard, this, &MainWindow::goToDashboard);
     connect(fileUploadPage, &FileUploadPage::backToDashboard, this, &MainWindow::goToDashboard);
     connect(shareFilepage, &ShareFilePage::backToDashboard, this, &MainWindow::goToDashboard);
     connect(keyGenPage, &KeyGenPage::goToLogin, this, &MainWindow::goToLogin);
+    connect(dashboardPage, &Dashboard::logOutRequested, this, &MainWindow::handleLogout);
 
     connect(signUpPage, &SignUpPage::signUpSuccessful, this, [=](const QString &username, const QString &email, const QString &hashedPassword) {
         filePasswordPage->setUserData(username, email, hashedPassword);
@@ -199,7 +201,7 @@ MainWindow::MainWindow(QWidget *parent)
         goToDashboard();
     });
     connect(dashboardPage, &Dashboard::goToDecryptSharedFile, this, [=](const FileData &file, QString jwtToken){
-        decryptSharedFile->setFileData(file);
+        decryptSharedFile->setFileData(file, jwtToken);
         goToDecryptSharedFile();
     });
 
@@ -244,3 +246,14 @@ void MainWindow::goToDecryptSharedFile() {
     ui->stackedWidget->setCurrentWidget(decryptSharedFile);
 }
 
+void MainWindow::handleLogout() {
+    // Clear all relevant user/session data
+    loginPage->reset();
+    dashboardPage->reset();
+    fileUploadPage->reset();
+    filePasswordPage->reset();
+    shareFilepage->reset();
+
+    goToMenu();
+
+}

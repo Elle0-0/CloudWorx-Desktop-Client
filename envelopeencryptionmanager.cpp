@@ -124,6 +124,7 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
         qDebug() << "[encryptAndStoreFile] Starting encryption process for user:" << userId;
         qDebug() << "[encryptAndStoreFile] File path:" << filePath;
 
+
         // Get user's KEK
         QByteArray userKEK = getUserKEK(token, password);
         if (userKEK.isEmpty()) {
@@ -140,8 +141,10 @@ QString EnvelopeEncryptionManager::encryptAndStoreFile(const QString& userId, co
         QByteArray fileData = file.readAll();
         file.close();
 
+        UserKEKData kekData = fetchUserKEK(token);
+
         // Encrypt file with KEK
-        EnvelopeEncryptionResult encResult = EnvelopeEncryption::encryptWithKEK(userId, file.fileName(), fileData, userKEK);
+        EnvelopeEncryptionResult encResult = EnvelopeEncryption::encryptWithKEK(userId, file.fileName(), fileData, userKEK, kekData.kek_created_at);
         qDebug() << "[encryptAndStoreFile] File encrypted.";
         qDebug() << "  ivFile:" << encodeBase64(encResult.msgNonce);
         qDebug() << "  ivDEK:" << encodeBase64(encResult.dekNonce);
@@ -317,6 +320,7 @@ UserKEKData EnvelopeEncryptionManager::fetchUserKEK(const QString& authToken)
     kekData.salt = userInfo.salt;
     kekData.timeCost = static_cast<quint32>(userInfo.t);
     kekData.memoryCost = static_cast<quint32>(userInfo.m);
+    kekData.kek_created_at = userInfo.kekCreatedAt;
 
     return kekData;
 }

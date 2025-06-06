@@ -18,6 +18,7 @@ public:
     void setIdAndToken(QString userId, QString jwtToken);
     void loadFiles();
     void loadSharedFiles();
+    void reset();
     ~Dashboard();
 
 private:
@@ -26,11 +27,13 @@ private:
     QString userId;
     QString jwtToken;
 
+
 signals:
     void goToFileDecryption(const FileData &file, QString jwtToken);
     void goToFileShare(const FileData &file, QString jwtToken);
     void goToFileUpload(const QString userId, const QString jwtToken);
     void goToDecryptSharedFile(FileData file, QString jwtToken);
+    void logOutRequested();
 
 
 private slots:
@@ -40,6 +43,7 @@ private slots:
     void on_refreshButton_clicked();
     void on_deleteFileButton_clicked();
     void onTabChanged(int index);
+    void on_logOutButton_clicked();
 };
 
 #endif // DASHBOARD_H

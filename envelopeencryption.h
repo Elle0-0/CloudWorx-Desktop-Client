@@ -58,7 +58,7 @@ public:
     // Encryption/Decryption functions
     static WrappedKEKResult generateAndWrapKEK(const QString username, const QByteArray& password);
     static EnvelopeEncryptionResult encryptWithKEK(const QString userid, const QString fileName,
-                                                   const QByteArray& plaintext, const QByteArray& kek);
+                                                   const QByteArray& plaintext, const QByteArray& kek, const QString kekCreated);
     static QByteArray decrypt(const EnvelopeDecryptionInput& input, const QByteArray& password);
 
     // File operations

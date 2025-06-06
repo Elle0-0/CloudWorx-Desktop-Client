@@ -32,6 +32,11 @@ Dashboard::~Dashboard()
     delete ui;
 }
 
+void Dashboard::on_logOutButton_clicked()
+{
+    emit logOutRequested(); // Ask MainWindow to handle logout
+}
+
 
 void Dashboard::on_decryptFileButton_clicked()
 {
@@ -79,9 +84,9 @@ void Dashboard::on_decryptFileButton_clicked()
         file.fileName = sharedFile.fileName;
         file.encryptedFile = sharedFile.encryptedFile;
         file.sharedBy = sharedFile.sharedByUsername;  // Optional display
-        file.nonce = sharedFile.nonce;
-        file.ephemeralPublicKey = sharedFile.ephemeralPublicKey;
-        file.senderSignature = sharedFile.senderSignature;
+        file.nonce = sharedFile.nonce.toBase64();
+        file.ephemeralPublicKey = sharedFile.ephemeralPublicKey.toBase64();
+        file.senderSignature = sharedFile.senderSignature.toBase64();
         file.senderX25519PublicKeyPem = sharedFile.senderX25519PublicKeyPem;
         file.senderEd25519PublicKeyPem = sharedFile.senderEd25519PublicKeyPem;
 
@@ -157,7 +162,7 @@ FileData convertSharedToFileData(const SharedFileModel& shared) {
     file.fileName = shared.file_name;
     file.fileType = shared.file_type;
     file.fileSize = shared.file_size;
-    // Since these fields don't exist for shared files, leave empty or default
+
     file.ivFile = QString();
     file.ivDEK = QString();
     file.encryptedDEK = QString();
@@ -185,6 +190,7 @@ void Dashboard::loadSharedFiles()
     for (const SharedFileModel& shared : sharedFiles) {
         qDebug() << "File name:" << shared.file_name
                  << " | file_id:" << shared.file_id
+                 << "file share id" << shared.share_id
                  << " | file_type:" << shared.file_type
                  << " | file_size:" << shared.file_size;
 
@@ -247,6 +253,23 @@ void Dashboard::onTabChanged(int index)
         loadSharedFiles();
     }
 }
+
+void Dashboard::reset()
+{
+    // Clear list model
+    model->clear();
+
+    // Reset views (deselect any selection)
+    ui->listView->clearSelection();
+    ui->listView_2->clearSelection();
+
+    ui->tabWidget->setCurrentIndex(0);
+
+    // Clear session data
+    jwtToken.clear();
+    userId.clear();
+}
+
 
 
 

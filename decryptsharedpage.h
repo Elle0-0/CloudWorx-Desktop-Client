@@ -16,6 +16,8 @@ public:
     explicit DecryptSharedPage(QWidget *parent = nullptr);
     void setFileData(const FileData &file);
     QString getPrivateKeyPath() const { return privSignatureKeyFilePath; }
+    void setFileData(const FileData &fileData, QString jwtToken);
+    QByteArray extractRawFromPEM(const QString &pemStr);
     ~DecryptSharedPage();
 
 private slots:
@@ -23,10 +25,16 @@ private slots:
 
     void on_decryptButton_clicked();
 
+    void on_dashboardButton_clicked();
+
 private:
     Ui::DecryptSharedPage *ui;
     QString privSignatureKeyFilePath;
     FileData fileData;
+    QString authToken;
+
+signals:
+    void backToDashboard();
 };
 
 #endif // DECRYPTSHAREDPAGE_H

@@ -125,7 +125,7 @@ bool SharesApi::downloadSharedFile(const QString& shareId,
                 fileOut.fileId = obj.value("file_id").toString();
                 fileOut.fileName = obj.value("file_name").toString();
                 fileOut.fileType = obj.value("file_type").toString();
-                fileOut.fileSize = obj.value("file_size").toInteger(); // or toInt()
+                fileOut.fileSize = obj.value("file_size").toInt();
                 fileOut.sharedBy = obj.value("shared_by").toString();
                 fileOut.sharedByUsername = obj.value("shared_by_username").toString();
 

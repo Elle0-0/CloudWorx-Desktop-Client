@@ -32,7 +32,7 @@ qrc_*.cpp
 *.so
 *.so.*
 *.dll
-*.exe
+# *.exe
 *.a
 *.lib
 

@@ -13,6 +13,7 @@ class LoginPage : public QWidget
 
 public:
     explicit LoginPage(QWidget *parent = nullptr);
+    void reset();
     ~LoginPage();
 
 private slots:

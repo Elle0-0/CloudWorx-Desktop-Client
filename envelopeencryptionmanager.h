@@ -24,6 +24,7 @@ struct UserKEKData {
     QString salt;           // Base64 encoded salt
     quint32 timeCost;
     quint32 memoryCost;
+    QString kek_created_at;
 
 
     // JSON conversion

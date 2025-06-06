@@ -14,6 +14,7 @@ class FileUploadPage : public QWidget
 public:
     explicit FileUploadPage(QWidget *parent = nullptr);
     void setIdAndToken(QString userId, QString jwtToken);
+    void reset();
     ~FileUploadPage();
 
 private slots:

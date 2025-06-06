@@ -284,3 +284,25 @@ void ShareFilePage::on_privKeyButton_2_clicked()
 
 }
 
+void ShareFilePage::reset()
+{
+    // Clear text fields
+    ui->userTextField->clear();
+    ui->encryptionPasswordTextField->clear();
+
+    // Clear clickable file paths
+    ui->privKey->clear();
+    ui->signKey->clear();
+    ui->signPubKey->clear();
+
+    // Reset stored paths
+    privKeyFilePath.clear();
+    privSignatureKeyFilePath.clear();
+    pubSignatureKeyFilePath.clear();
+
+    // Reset file data and token
+    file = FileData();
+    authToken.clear();
+
+    ui->userTextField->setFocus();
+}

@@ -13,6 +13,7 @@ class SignUpPage : public QWidget
 
 public:
     explicit SignUpPage(QWidget *parent = nullptr);
+    void reset();
     ~SignUpPage();
 
 private:
